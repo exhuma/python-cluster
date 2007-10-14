@@ -32,8 +32,8 @@ def flatten(L):
 
 def median(numbers):
    """Return the median of the list of numbers.
-   
-   found at: http://mail.python.org/pipermail/python-list/2004-December/253517.html"""
+   found at: http://mail.python.org/pipermail/python-list/2004-December/294990.html"""
+
    # Sort the list and take the middle element.
    n = len(numbers)
    copy = numbers[:] # So that "numbers" keeps its original order
@@ -45,8 +45,7 @@ def median(numbers):
 
 def mean(numbers):
    """Returns the arithmetic mean of a numeric list.
-
-   found at: http://mail.python.org/pipermail/python-list/2004-December/253517.html"""
+   found at: http://mail.python.org/pipermail/python-list/2004-December/294990.html"""
    return float(sum(numbers)) / float(len(numbers))
 
 def minkowski_distance(x, y, p=2):
