@@ -19,6 +19,27 @@ from cluster import *
 from difflib import SequenceMatcher
 import unittest
 
+def compare_list(x, y):
+   """
+   Compare lists by content. Ordering does not matter.
+   Returns True if both lists contain the same items (and are of identical
+   length)
+   """
+
+   cmpx = [set(cluster) for cluster in x]
+   cmpy = [set(cluster) for cluster in y]
+
+   all_ok = True
+
+   for cset in cmpx:
+      all_ok &= cset in cmpy
+
+   for cset in cmpy:
+      all_ok &= cset in cmpx
+
+   return all_ok
+
+
 class HClusterSmallListTestCase(unittest.TestCase):
    " Test for Bug #1516204 "
 
@@ -118,14 +139,17 @@ class KCluster2DTestCase(unittest.TestCase):
       self.assertRaises(ValueError, KMeansClustering, data)
 
    def testPointDoubling(self):
-      "test for bug ?"
-      data = [ (0,0), (7,3), (2,6), (3,5), (3,6), (0,0), (8,1), (3,4), (8,3), (9,2), (2,5), (9,3) ]
+      "test for bug #1604868"
+      data = [ (18,13), (15, 12), (17,12), (18,12), (19,12), (16,11), (18, 11),
+             (19,10), (0,0), (1, 4), (1,2), (2,3), (4,1), (4,3), (5,2), (6,1)]
       cl = KMeansClustering(data)
       clusters = cl.getclusters(2)
-      self.assertEqual(
-            cl.getclusters(2),
-            [[(0, 0), (2, 6), (3, 6), (2, 5), (3, 5), (3, 4), (1, 5)],
-             [(7, 3), (9, 2), (9, 3), (8, 1), (8, 3)]])
+      expected = [[(18,13), (15, 12), (17,12), (18,12), (19,12), (16,11), (18, 11), (19,10)],
+             [(0,0), (1, 4), (1,2), (2,3), (4,1), (5,2), (6,1), (4,3)]]
+      self.assertTrue( compare_list(
+            clusters,
+            expected ),
+            "Elements differ!\n%s\n%s" % (clusters, expected))
 
    def testClustering(self):
       "Basic clustering test"
