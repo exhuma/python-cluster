@@ -130,8 +130,13 @@ class KCluster2DTestCase(unittest.TestCase):
    def testClusterCount(self):
       "Test that asking for less than 2 clusters raises an error"
       cl = KMeansClustering([876, 123, 344, 676], distance=lambda x,y: abs(x-y))
-      self.assertRaises(ValueError, cl.getclusters, 0)
-      self.assertRaises(ValueError, cl.getclusters, 1)
+      self.assertRaises(ClusteringError, cl.getclusters, 0)
+      self.assertRaises(ClusteringError, cl.getclusters, 1)
+
+   def testNonsenseCluster(self):
+      "Test that asking for more clusters than data-items available raises an error"
+      cl = KMeansClustering([876, 123], distance=lambda x,y: abs(x-y))
+      self.assertRaises(ClusteringError, cl.getclusters, 5)
 
    def testUniformLength(self):
       "Test if there is an item in the cluster that has a different cardinality"
@@ -161,6 +166,18 @@ class KCluster2DTestCase(unittest.TestCase):
             [[(8, 2), (8, 1), (8, 3), (7, 3), (9, 2), (9, 3)],
              [(3, 5), (1, 5), (3, 4), (2, 6), (2, 5), (3, 6)]])
 
+class KClusterSFBugs(unittest.TestCase):
+
+   def testLostFunctionReference(self):
+      "test for bug #1727558"
+      cl = KMeansClustering([(1,1), (20,40), (20,41)], lambda x,y:x+y)
+      clusters = cl.getclusters(3)
+      expected = [(1,1), (20,40), (20,41)]
+      self.assertTrue( compare_list(
+            clusters,
+            expected ),
+            "Elements differ!\n%s\n%s" % (clusters, expected))
+
 unittest.TextTestRunner(verbosity=2).run(
       unittest.TestSuite((
             unittest.makeSuite(HClusterSmallListTestCase),
@@ -168,5 +185,6 @@ unittest.TextTestRunner(verbosity=2).run(
             unittest.makeSuite(HClusterStringTestCase),
             unittest.makeSuite(KClusterSmallListTestCase),
             unittest.makeSuite(KCluster2DTestCase),
+            unittest.makeSuite(KClusterSFBugs),
          ))
       )

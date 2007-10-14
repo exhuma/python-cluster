@@ -17,6 +17,9 @@
 
 from types import TupleType
 
+class ClusteringError(Exception):
+   pass
+
 def flatten(L):
    """
    Flattens a list.
@@ -632,6 +635,8 @@ class KMeansClustering:
                              euclidian-distance algorithm on them.
       """
       self.__data = data
+      self.distance = distance
+      self.__initial_length = len(data)
 
       # test if each item is of same dimensions
       if len(data) > 1 and isinstance(data[0], TupleType):
@@ -654,13 +659,20 @@ class KMeansClustering:
          n - The amount of clusters that should be generated.
              n must be greater than 1
       """
+
       # only proceed if we got sensible input
       if n <= 1:
-         raise ValueError("When clustering, you need to ask for at least two clusters! You asked for %d" % n)
+         raise ClusteringError("When clustering, you need to ask for at least two clusters! You asked for %d" % n)
 
       # return the data straight away if there is nothing to cluster
-      if self.__data == [] or len(self.__data) == 1:
+      if self.__data == [] or len(self.__data) == 1 or n == self.__initial_length:
          return self.__data
+
+      # It makes no sense to ask for more clusters than data-items available
+      if n > self.__initial_length:
+         raise ClusteringError( """Unable to generate more clusters than items 
+available. You supplied %d items, and asked for %d clusters.""" %
+               (self.__initial_length, n) )
 
       self.initialiseClusters(self.__data, n)
 
