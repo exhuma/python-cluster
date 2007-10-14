@@ -4,7 +4,7 @@ readmeContents = open("README").read()
 parastart = readmeContents.find('=\n')+3 # index where the first paragraph starts
 
 setup(name='cluster',
-      version='1.1.1b2',
+      version='1.1.1b3',
       author='Michel Albert',
       author_email='exhuma@users.sourceforge.net',
       url='http://python-cluster.sourceforge.net/',

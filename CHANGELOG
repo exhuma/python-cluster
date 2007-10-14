@@ -1,3 +1,8 @@
+1.1.1b3
+   - Fixed bug #1727558
+   - Some more unit-tests
+   - ValueError changed to ClusteringError where appropriate
+
 1.1.1b2
    - Fixed bug #1604859 (thanks to Willi Richert for reporting it)
 
