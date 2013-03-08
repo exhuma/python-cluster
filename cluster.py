@@ -703,7 +703,7 @@ class KMeansClustering:
                 if len(item) != control_length:
                     raise ValueError("Each item in the data list must have "
                             "the same amount of dimensions. Item %r was out "
-                            "of line!" % item)
+                            "of line!" % (item,))
         # now check if we need and have a distance function
         if (len(data) > 1 and not isinstance(data[0], TupleType) and
                 distance is None):
