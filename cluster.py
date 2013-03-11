@@ -680,7 +680,7 @@ class KMeansClustering:
       >>> clusters = cl.getclusters(2)
     """
 
-    def __init__(self, data, distance=None):
+    def __init__(self, data, distance=None, equality=None):
         """
         Constructor
 
@@ -690,11 +690,14 @@ class KMeansClustering:
                        Default: It assumes the tuples contain numeric values
                                 and appiles a generalised form of the
                                 euclidian-distance algorithm on them.
+            equality - A function to test equality of items. By default the
+                       standard python equality operator (``==``) is applied.
         """
         self.__clusters = []
         self.__data = data
         self.distance = distance
         self.__initial_length = len(data)
+        self.equality = equality
 
         # test if each item is of same dimensions
         if len(data) > 1 and isinstance(data[0], TupleType):
@@ -768,7 +771,7 @@ class KMeansClustering:
                     centroid(closest_cluster)):
                 closest_cluster = cluster
 
-        if closest_cluster != origin:
+        if id(closest_cluster) != id(origin):
             self.move_item(item, origin, closest_cluster)
             return True
         else:
@@ -784,7 +787,16 @@ class KMeansClustering:
             origin      - the originating cluster
             destination - the target cluster
         """
-        destination.append(origin.pop(origin.index(item)))
+        if self.equality:
+            item_index = 0
+            for i, element in enumerate(origin):
+                if self.equality(element, item):
+                    item_index = i
+                    break
+        else:
+            item_index = origin.index(item)
+
+        destination.append(origin.pop(item_index))
 
     def initialise_clusters(self, input_, clustercount):
         """

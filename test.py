@@ -202,15 +202,41 @@ class KClusterSFBugs(unittest.TestCase):
                 expected),
                 "Elements differ!\n%s\n%s" % (clusters, expected))
 
+    def testMultidimArray(self):
+        from random import random
+        data = []
+        for _ in range(200):
+            data.append([random(), random()])
+        cl = KMeansClustering(data, lambda p0, p1: (
+            p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2)
+        cl.getclusters(10)
+
+
+class NumpyTests(unittest.TestCase):
+
+    def testNumpyRandom(self):
+        from cluster import KMeansClustering
+        from numpy import random as rnd
+        data = rnd.rand(500, 2)
+        cl = KMeansClustering(data, lambda p0, p1: (
+            p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2, numpy.array_equal)
+        cl.getclusters(10)
+
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(
-            unittest.TestSuite((
-                    unittest.makeSuite(HClusterSmallListTestCase),
-                    unittest.makeSuite(HClusterIntegerTestCase),
-                    unittest.makeSuite(HClusterStringTestCase),
-                    unittest.makeSuite(KClusterSmallListTestCase),
-                    unittest.makeSuite(KCluster2DTestCase),
-                    unittest.makeSuite(KClusterSFBugs),
-                ))
-            )
+    suite = unittest.TestSuite((
+            unittest.makeSuite(HClusterSmallListTestCase),
+            unittest.makeSuite(HClusterIntegerTestCase),
+            unittest.makeSuite(HClusterStringTestCase),
+            unittest.makeSuite(KClusterSmallListTestCase),
+            unittest.makeSuite(KCluster2DTestCase),
+            unittest.makeSuite(KClusterSFBugs)))
+
+    try:
+        import numpy  # NOQA
+        tests = unittest.makeSuite(NumpyTests)
+        suite.addTests(tests)
+    except ImportError:
+        print "numpy not available. Associated test will not be loaded!"
+
+    unittest.TextTestRunner(verbosity=2).run(suite)
