@@ -80,17 +80,17 @@ def minkowski_distance(x, y, p=2):
     return pow(sum, 1.0 / float(p))
 
 
-def genmatrix(list, combinfunc, symmetric=False, diagonal=None):
+def genmatrix(data, combinfunc, symmetric=False, diagonal=None):
     """
-    Takes a list and generates a 2D-matrix using the supplied combination
-    function to calculate the values.
+    Takes a list of data and generates a 2D-matrix using the supplied
+    combination function to calculate the values.
 
     PARAMETERS
-        list        - the list of items
+        data        - the list of items
         combinfunc  - the function that is used to calculate teh value in a
                       cell.  It has to cope with two arguments.
         symmetric   - Whether it will be a symmetric matrix along the diagonal.
-                      For example, it the list contains integers, and the
+                      For example, if the list contains integers, and the
                       combination function is abs(x-y), then the matrix will
                       be symmetric.
                       Default: False
@@ -102,10 +102,10 @@ def genmatrix(list, combinfunc, symmetric=False, diagonal=None):
     """
     matrix = []
     row_index = 0
-    for item in list:
+    for item in data:
         row = []
         col_index = 0
-        for item2 in list:
+        for item2 in data:
             if diagonal is not None and col_index == row_index:
                 # if this is a cell on the diagonal
                 row.append(diagonal)
@@ -122,23 +122,24 @@ def genmatrix(list, combinfunc, symmetric=False, diagonal=None):
     return matrix
 
 
-def printmatrix(list):
+def printmatrix(data):
     """
-    Prints out a 2-dimensional list cleanly.  This is useful for debugging.
+    Prints out a 2-dimensional list of data cleanly.
+    This is useful for debugging.
 
     PARAMETERS
-        list  -  the 2D-list to display
+        data  -  the 2D-list to display
     """
     # determine maximum length
     maxlen = 0
-    colcount = len(list[0])
-    for col in list:
+    colcount = len(data[0])
+    for col in data:
         for cell in col:
             maxlen = max(len(str(cell)), maxlen)
     # print data
     format = " %%%is |" % maxlen
     format = "|" + format * colcount
-    for row in list:
+    for row in data:
         print format % tuple(row)
 
 
@@ -160,9 +161,9 @@ def dotproduct(a, b):
     return out
 
 
-def centroid(list, method=median):
+def centroid(data, method=median):
     "returns the central vector of a list of vectors"
     out = []
-    for i in range(len(list[0])):
-        out.append(method([x[i] for x in list]))
+    for i in range(len(data[0])):
+        out.append(method([x[i] for x in data]))
     return tuple(out)
