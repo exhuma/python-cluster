@@ -15,10 +15,14 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+import logging
 
 from cluster.cluster import Cluster
 from cluster.method.base import BaseClusterMethod
 from cluster.util import median, mean, genmatrix
+
+
+logger = logging.getLogger(__name__)
 
 
 class HierarchicalClustering(BaseClusterMethod):
@@ -37,15 +41,17 @@ class HierarchicalClustering(BaseClusterMethod):
         Note that all of the returned clusters are more that 90 apart
     """
 
-    def __init__(self, data, distance_function, linkage='single'):
+    def __init__(self, data, distance_function, linkage=None):
         """
         Constructor
 
         See BaseClusterMethod.__init__ for more details.
         """
+        if not linkage:
+            linkage = 'single'
+        logger.info("Initializing HierarchicalClustering object with linkage method %s",
+                    linkage)
         BaseClusterMethod.__init__(self, data, distance_function)
-
-        # set the linkage type to single
         self.set_linkage_method(linkage)
         self.__cluster_created = False
 
@@ -199,6 +205,7 @@ class HierarchicalClustering(BaseClusterMethod):
             level    -  The current level of clustering
             sequence -  The sequence number of the clustering
         """
+        logger.info("Performing cluster()")
 
         if matrix is None:
             # create level 0, first iteration (sequence)
@@ -247,6 +254,7 @@ class HierarchicalClustering(BaseClusterMethod):
 
         # all the data is in one single cluster. We return that and stop
         self.__cluster_created = True
+        logger.info("Call to cluster() is complete")
         return
 
     def getlevel(self, threshold):

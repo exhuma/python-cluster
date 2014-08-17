@@ -15,6 +15,11 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 class ClusteringError(Exception):
     pass
@@ -100,12 +105,12 @@ def genmatrix(data, combinfunc, symmetric=False, diagonal=None):
                       will be "0".  If this value is set to None, then the
                       diagonal will be calculated.  Default: None
     """
+    logger.info("Generating matrix for %s items - O(n^2)", len(data))
     matrix = []
-    row_index = 0
-    for item in data:
+    for row_index, item in enumerate(data):
+        logger.debug("Generating row %s", row_index)
         row = []
-        col_index = 0
-        for item2 in data:
+        for col_index, item2 in enumerate(data):
             if diagonal is not None and col_index == row_index:
                 # if this is a cell on the diagonal
                 row.append(diagonal)
@@ -116,9 +121,8 @@ def genmatrix(data, combinfunc, symmetric=False, diagonal=None):
             else:
                 # if this cell is not on the diagonal
                 row.append(combinfunc(item, item2))
-            col_index += 1
         matrix.append(row)
-        row_index += 1
+    logger.info("Matrix generated")
     return matrix
 
 
