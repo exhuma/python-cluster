@@ -16,6 +16,6 @@
 #
 
 
-from cluster_method.hierarchical import HierarchicalClustering
-from cluster_method.kmeans import KMeansClustering
+from method.hierarchical import HierarchicalClustering
+from method.kmeans import KMeansClustering
 from util import ClusteringError

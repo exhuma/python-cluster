@@ -14,7 +14,7 @@ setup(
     author='Michel Albert',
     author_email='exhuma@users.sourceforge.net',
     url='http://python-cluster.sourceforge.net/',
-    packages=['cluster', 'cluster.cluster_method'],
+    packages=['cluster', 'cluster.method'],
     license='LGPL',
     description=readme_contents[parastart:sentence_end],
     long_description=readme_contents)

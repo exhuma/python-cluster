@@ -17,7 +17,7 @@
 
 
 from cluster.cluster import Cluster
-from cluster.cluster_method.base import BaseClusterMethod
+from cluster.method.base import BaseClusterMethod
 from cluster.util import median, mean, genmatrix
 
 
