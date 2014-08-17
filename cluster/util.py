@@ -108,7 +108,10 @@ def genmatrix(data, combinfunc, symmetric=False, diagonal=None):
     logger.info("Generating matrix for %s items - O(n^2)", len(data))
     matrix = []
     for row_index, item in enumerate(data):
-        logger.debug("Generating row %s", row_index)
+        logger.debug("Generating row %s/%s (%0.2f)",
+                     row_index,
+                     len(data),
+                     100.0 * row_index / len(data))
         row = []
         for col_index, item2 in enumerate(data):
             if diagonal is not None and col_index == row_index:
