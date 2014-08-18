@@ -193,7 +193,7 @@ class HierarchicalClustering(BaseClusterMethod):
 
         return mindist
 
-    def cluster(self, matrix=None, level=None, sequence=None):
+    def cluster(self, matrix=None, level=None, sequence=None, num_processes=None):
         """
         Perform hierarchical clustering. This method is automatically called
         by the constructor so you should not need to call it explicitly.
@@ -204,6 +204,11 @@ class HierarchicalClustering(BaseClusterMethod):
                         other
             level    -  The current level of clustering
             sequence -  The sequence number of the clustering
+            num_processes
+                     - If you want to use multiprocessing to split up the work
+                       and run genmatrix() in parallel, specify num_processes
+                       > 1 and this number of workers will be spun up, the work
+                       split up amongst them evenly. Default: 1
         """
         logger.info("Performing cluster()")
 
@@ -216,7 +221,7 @@ class HierarchicalClustering(BaseClusterMethod):
         # if the matrix only has two rows left, we are done
         while len(matrix) > 2 or matrix == []:
 
-            matrix = genmatrix(self._data, self.linkage, True, 0)
+            matrix = genmatrix(self._data, self.linkage, True, 0, num_processes)
 
             smallestpair = None
             mindistance = None

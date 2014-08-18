@@ -16,6 +16,7 @@
 #
 
 import logging
+from multiprocessing import Process, Queue, current_process
 
 
 logger = logging.getLogger(__name__)
@@ -85,7 +86,7 @@ def minkowski_distance(x, y, p=2):
     return pow(sum, 1.0 / float(p))
 
 
-def genmatrix(data, combinfunc, symmetric=False, diagonal=None):
+def genmatrix(data, combinfunc, symmetric=False, diagonal=None, num_processes=1):
     """
     Takes a list of data and generates a 2D-matrix using the supplied
     combination function to calculate the values.
@@ -104,27 +105,95 @@ def genmatrix(data, combinfunc, symmetric=False, diagonal=None):
                       could be the function "x-y". Then each diagonal cell
                       will be "0".  If this value is set to None, then the
                       diagonal will be calculated.  Default: None
+        num_processes
+                    - If you want to use multiprocessing to split up the work
+                      and run combinfunc() in parallel, specify num_processes
+                      > 1 and this number of workers will be spun up, the work
+                      split up amongst them evenly. Default: 1
     """
     logger.info("Generating matrix for %s items - O(n^2)", len(data))
+    use_multiprocessing = num_processes > 1
+    if use_multiprocessing:
+        logger.info("Using multiprocessing on %s processes!", num_processes)
+
     matrix = []
+    task_queue = Queue()
+    done_queue = Queue()
+
+    def worker():
+        """Multiprocessing task function run by worker processes
+        """
+        tasks_completed = 0
+        for task in iter(task_queue.get, 'STOP'):
+            col_index, item, item2 = task
+            result = (col_index, combinfunc(item, item2))
+            done_queue.put(result)
+            tasks_completed += 1
+        logger.info("Worker %s performed %s tasks",
+                    current_process().name,
+                    tasks_completed)
+
+    if use_multiprocessing:
+        logger.info("Spinning up %s workers", num_processes)
+        processes = [Process(target=worker) for i in xrange(num_processes)]
+        [process.start() for process in processes]
+
     for row_index, item in enumerate(data):
         logger.debug("Generating row %s/%s (%0.2f)",
                      row_index,
                      len(data),
                      100.0 * row_index / len(data))
-        row = []
+        row = {}
+        if use_multiprocessing:
+            num_tasks_queued = num_tasks_completed = 0
         for col_index, item2 in enumerate(data):
             if diagonal is not None and col_index == row_index:
-                # if this is a cell on the diagonal
-                row.append(diagonal)
+                # This is a cell on the diagonal
+                row[col_index] = diagonal
             elif symmetric and col_index < row_index:
-                # if the matrix is symmetric and we are "in the lower left
-                # triangle"
-                row.append(matrix[col_index][row_index])
+                # The matrix is symmetric and we are "in the lower left
+                # triangle" - fill this in after (in case of multiprocessing)
+                pass
+            # Otherwise, this cell is not on the diagonal and we do indeed
+            # need to call combinfunc()
+            elif use_multiprocessing:
+                # Add that thing to the task queue!
+                task_queue.put((col_index, item, item2))
+                num_tasks_queued += 1
+                # Start grabbing the results as we go, so as not to stuff all of
+                # the worker args into memory at once (as Queue.get() is a
+                # blocking operation)
+                if num_tasks_queued > num_processes:
+                    col_index, result = done_queue.get()
+                    row[col_index] = result
+                    num_tasks_completed += 1
             else:
-                # if this cell is not on the diagonal
-                row.append(combinfunc(item, item2))
-        matrix.append(row)
+                # Otherwise do it here, in line
+                row[col_index] = combinfunc(item, item2)
+
+        if symmetric:
+            # One more iteration to get symmetric lower left triangle
+            for col_index, item2 in enumerate(data):
+                if col_index >= row_index:
+                    break
+                # post-process symmetric "lower left triangle"
+                row[col_index] = matrix[col_index][row_index]
+
+        if use_multiprocessing:
+            # Grab the remaining worker task results
+            while num_tasks_completed < num_tasks_queued:
+                col_index, result = done_queue.get()
+                row[col_index] = result
+                num_tasks_completed += 1
+
+        row_indexed = [row[index] for index in xrange(len(data))]
+        matrix.append(row_indexed)
+
+    if use_multiprocessing:
+        logger.info("Stopping/joining %s workers", num_processes)
+        [task_queue.put('STOP') for i in xrange(num_processes)]
+        [process.join() for process in processes]
+
     logger.info("Matrix generated")
     return matrix
 

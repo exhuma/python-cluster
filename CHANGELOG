@@ -1,3 +1,6 @@
+1.3.0
+   - Multiprocessing for genmatrix
+
 1.2.0
    - Split up one big file into smaller more logical sub-modules
 
