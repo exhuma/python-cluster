@@ -41,11 +41,17 @@ class HierarchicalClustering(BaseClusterMethod):
         Note that all of the returned clusters are more that 90 apart
     """
 
-    def __init__(self, data, distance_function, linkage=None):
+    def __init__(self, data, distance_function, linkage=None, num_processes=1):
         """
         Constructor
 
         See BaseClusterMethod.__init__ for more details.
+
+            num_processes
+                     - If you want to use multiprocessing to split up the work
+                       and run genmatrix() in parallel, specify num_processes
+                       > 1 and this number of workers will be spun up, the work
+                       split up amongst them evenly. Default: 1
         """
         if not linkage:
             linkage = 'single'
@@ -53,6 +59,7 @@ class HierarchicalClustering(BaseClusterMethod):
                     "method %s", linkage)
         BaseClusterMethod.__init__(self, data, distance_function)
         self.set_linkage_method(linkage)
+        self.num_processes = num_processes
         self.__cluster_created = False
 
     def set_linkage_method(self, method):
@@ -193,7 +200,7 @@ class HierarchicalClustering(BaseClusterMethod):
 
         return mindist
 
-    def cluster(self, matrix=None, level=None, sequence=None, num_processes=None):
+    def cluster(self, matrix=None, level=None, sequence=None):
         """
         Perform hierarchical clustering. This method is automatically called
         by the constructor so you should not need to call it explicitly.
@@ -204,11 +211,6 @@ class HierarchicalClustering(BaseClusterMethod):
                         other
             level    -  The current level of clustering
             sequence -  The sequence number of the clustering
-            num_processes
-                     - If you want to use multiprocessing to split up the work
-                       and run genmatrix() in parallel, specify num_processes
-                       > 1 and this number of workers will be spun up, the work
-                       split up amongst them evenly. Default: 1
         """
         logger.info("Performing cluster()")
 
@@ -221,7 +223,11 @@ class HierarchicalClustering(BaseClusterMethod):
         # if the matrix only has two rows left, we are done
         while len(matrix) > 2 or matrix == []:
 
-            matrix = genmatrix(self._data, self.linkage, True, 0, num_processes)
+            matrix = genmatrix(self._data,
+                               self.linkage,
+                               True,
+                               0,
+                               self.num_processes)
 
             smallestpair = None
             mindistance = None
