@@ -234,9 +234,9 @@ if __name__ == '__main__':
         unittest.makeSuite(HClusterSmallListTestCase),
         unittest.makeSuite(HClusterStringTestCase),
         unittest.makeSuite(KCluster2DTestCase),
-        unittest.makeSuite(KClusterSFBugs)),
+        unittest.makeSuite(KClusterSFBugs),
         unittest.makeSuite(KClusterSmallListTestCase),
         unittest.makeSuite(NumpyTests),
-    )
+    ))
 
     unittest.TextTestRunner(verbosity=2).run(suite)
