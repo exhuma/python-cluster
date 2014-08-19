@@ -18,8 +18,9 @@
 import logging
 
 from cluster.cluster import Cluster
+from cluster.matrix import ItemItemMatrix
 from cluster.method.base import BaseClusterMethod
-from cluster.util import median, mean, genmatrix
+from cluster.util import median, mean
 
 
 logger = logging.getLogger(__name__)
@@ -223,11 +224,13 @@ class HierarchicalClustering(BaseClusterMethod):
         # if the matrix only has two rows left, we are done
         while len(matrix) > 2 or matrix == []:
 
-            matrix = genmatrix(self._data,
-                               self.linkage,
-                               True,
-                               0,
-                               self.num_processes)
+            # TODO: actually use the ItemItemMatrix object
+            item_item_matrix = ItemItemMatrix(self._data,
+                                              self.linkage,
+                                              True,
+                                              0,
+                                              self.num_processes)
+            matrix = item_item_matrix.matrix
 
             smallestpair = None
             mindistance = None
