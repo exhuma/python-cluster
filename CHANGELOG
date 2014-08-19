@@ -1,3 +1,6 @@
+1.2.0
+   - Split up one big file into smaller more logical sub-modules
+
 1.1.1b3
    - Fixed bug #1727558
    - Some more unit-tests

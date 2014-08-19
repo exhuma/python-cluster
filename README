@@ -21,7 +21,7 @@ USAGE
 
 A simple python program could look like this::
 
-   >>> from cluster import *
+   >>> from cluster import HierarchicalClustering
    >>> data = [12,34,23,32,46,96,13]
    >>> cl = HierarchicalClustering(data, lambda x,y: abs(x-y))
    >>> cl.getlevel(10)     # get clusters of items closer than 10
