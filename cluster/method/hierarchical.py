@@ -49,8 +49,8 @@ class HierarchicalClustering(BaseClusterMethod):
         """
         if not linkage:
             linkage = 'single'
-        logger.info("Initializing HierarchicalClustering object with linkage method %s",
-                    linkage)
+        logger.info("Initializing HierarchicalClustering object with linkage "
+                    "method %s", linkage)
         BaseClusterMethod.__init__(self, data, distance_function)
         self.set_linkage_method(linkage)
         self.__cluster_created = False
@@ -73,7 +73,7 @@ class HierarchicalClustering(BaseClusterMethod):
             self.linkage = self.uclus_distance
         else:
             raise ValueError('distance method must be one of single, '
-                    'complete, average of uclus')
+                             'complete, average of uclus')
 
     def uclus_distance(self, x, y):
         """
@@ -228,7 +228,7 @@ class HierarchicalClustering(BaseClusterMethod):
                     # if we are not on the diagonal (which is always 0)
                     # and if this cell represents a new minimum...
                     if ((rowindex != cellindex) and
-                        (cell < mindistance or smallestpair is None)):
+                            (cell < mindistance or smallestpair is None)):
                         smallestpair = (rowindex, cellindex)
                         mindistance = cell
                     cellindex += 1
@@ -237,7 +237,7 @@ class HierarchicalClustering(BaseClusterMethod):
             sequence += 1
             level = matrix[smallestpair[1]][smallestpair[0]]
             cluster = Cluster(level, self._data[smallestpair[0]],
-                    self._data[smallestpair[1]])
+                              self._data[smallestpair[1]])
 
             # maintain the data, by combining the the two most similar items
             # in the list we use the min and max functions to ensure the
@@ -247,9 +247,9 @@ class HierarchicalClustering(BaseClusterMethod):
             # value of the second "remove" call, but we don't know the order
             # in which they come. The max and min approach clarifies that
             self._data.remove(self._data[max(smallestpair[0],
-                smallestpair[1])])  # remove item 1
+                                             smallestpair[1])])  # remove item 1
             self._data.remove(self._data[min(smallestpair[0],
-                smallestpair[1])])  # remove item 2
+                                             smallestpair[1])])  # remove item 2
             self._data.append(cluster)  # append item 1 and 2 combined
 
         # all the data is in one single cluster. We return that and stop

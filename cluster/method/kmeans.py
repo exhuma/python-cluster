@@ -57,13 +57,13 @@ class KMeansClustering(object):
             for item in data[1:]:
                 if len(item) != control_length:
                     raise ValueError("Each item in the data list must have "
-                            "the same amount of dimensions. Item %r was out "
-                            "of line!" % (item,))
+                                     "the same amount of dimensions. Item "
+                                     "%r was out of line!" % (item,))
         # now check if we need and have a distance function
         if (len(data) > 1 and not isinstance(data[0], tuple) and
                 distance is None):
             raise ValueError("You supplied non-standard items but no "
-                    "distance function! We cannot continue!")
+                             "distance function! We cannot continue!")
         # we now know that we have tuples, and assume therefore that it's
         # items are numeric
         elif distance is None:
@@ -81,7 +81,8 @@ class KMeansClustering(object):
         # only proceed if we got sensible input
         if count <= 1:
             raise ClusteringError("When clustering, you need to ask for at "
-                    "least two clusters! You asked for %d" % count)
+                                  "least two clusters! "
+                                  "You asked for %d" % count)
 
         # return the data straight away if there is nothing to cluster
         if (self.__data == [] or len(self.__data) == 1 or
@@ -90,9 +91,10 @@ class KMeansClustering(object):
 
         # It makes no sense to ask for more clusters than data-items available
         if count > self.__initial_length:
-            raise ClusteringError("Unable to generate more clusters than "
-                    "items available. You supplied %d items, and asked for "
-                    "%d clusters." % (self.__initial_length, count) )
+            raise ClusteringError(
+                "Unable to generate more clusters than "
+                "items available. You supplied %d items, and asked for "
+                "%d clusters." % (self.__initial_length, count))
 
         self.initialise_clusters(self.__data, count)
 
@@ -119,8 +121,8 @@ class KMeansClustering(object):
         """
         closest_cluster = origin
         for cluster in self.__clusters:
-            if self.distance(item, centroid(cluster)) < self.distance(item,
-                    centroid(closest_cluster)):
+            if self.distance(item, centroid(cluster)) < self.distance(
+                    item, centroid(closest_cluster)):
                 closest_cluster = cluster
 
         if id(closest_cluster) != id(origin):
