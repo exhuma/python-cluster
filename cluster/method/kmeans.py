@@ -163,7 +163,7 @@ class KMeansClustering(object):
         """
         # initialise the clusters with empty lists
         self.__clusters = []
-        for _ in xrange(clustercount):
+        for _ in range(clustercount):
             self.__clusters.append([])
 
         # distribute the items into the clusters
