@@ -18,6 +18,11 @@
 from cluster import (HierarchicalClustering, KMeansClustering, ClusteringError)
 from difflib import SequenceMatcher
 import unittest
+try:
+    import numpy
+    NUMPY_AVAILABLE = True
+except:
+    NUMPY_AVAILABLE = False
 
 
 def compare_list(x, y):
@@ -212,12 +217,12 @@ class KClusterSFBugs(unittest.TestCase):
         cl.getclusters(10)
 
 
+@unittest.skipUnless(NUMPY_AVAILABLE,
+                     'numpy not available. Associated test will not be loaded!')
 class NumpyTests(unittest.TestCase):
 
     def testNumpyRandom(self):
-        from cluster import KMeansClustering
-        from numpy import random as rnd
-        data = rnd.rand(500, 2)
+        data = numpy.random.rand(500, 2)
         cl = KMeansClustering(data, lambda p0, p1: (
             p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2, numpy.array_equal)
         cl.getclusters(10)
@@ -225,18 +230,13 @@ class NumpyTests(unittest.TestCase):
 
 if __name__ == '__main__':
     suite = unittest.TestSuite((
-            unittest.makeSuite(HClusterSmallListTestCase),
-            unittest.makeSuite(HClusterIntegerTestCase),
-            unittest.makeSuite(HClusterStringTestCase),
-            unittest.makeSuite(KClusterSmallListTestCase),
-            unittest.makeSuite(KCluster2DTestCase),
-            unittest.makeSuite(KClusterSFBugs)))
-
-    try:
-        import numpy  # NOQA
-        tests = unittest.makeSuite(NumpyTests)
-        suite.addTests(tests)
-    except ImportError:
-        print "numpy not available. Associated test will not be loaded!"
+        unittest.makeSuite(HClusterIntegerTestCase),
+        unittest.makeSuite(HClusterSmallListTestCase),
+        unittest.makeSuite(HClusterStringTestCase),
+        unittest.makeSuite(KCluster2DTestCase),
+        unittest.makeSuite(KClusterSFBugs)),
+        unittest.makeSuite(KClusterSmallListTestCase),
+        unittest.makeSuite(NumpyTests),
+    )
 
     unittest.TextTestRunner(verbosity=2).run(suite)
