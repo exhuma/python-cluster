@@ -1,3 +1,6 @@
-
 *.pyc
-build
+/MANIFEST
+/build
+/dist
+/env
+/env3
