@@ -15,6 +15,8 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+from __future__ import print_function
+
 
 class Cluster(object):
     """
@@ -107,12 +109,12 @@ class Cluster(object):
         """
         Pretty-prints this cluster. Useful for debuging
         """
-        print depth * "    " + "[level %s]" % self.__level
+        print(depth * "    " + "[level %s]" % self.__level)
         for item in self.__items:
             if isinstance(item, Cluster):
                 item.display(depth + 1)
             else:
-                print depth * "    " + "%s" % item
+                print(depth * "    " + "%s" % item)
 
     def topology(self):
         """

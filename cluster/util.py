@@ -15,6 +15,7 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+from __future__ import print_function
 import logging
 
 
@@ -78,7 +79,7 @@ def minkowski_distance(x, y, p=2):
     """
     from math import pow
     assert len(y) == len(x)
-    assert x >= 1
+    assert len(x) >= 1
     sum = 0
     for i in range(len(x)):
         sum += abs(x[i] - y[i]) ** p
@@ -147,7 +148,7 @@ def printmatrix(data):
     format = " %%%is |" % maxlen
     format = "|" + format * colcount
     for row in data:
-        print format % tuple(row)
+        print(format % tuple(row))
 
 
 def magnitude(a):

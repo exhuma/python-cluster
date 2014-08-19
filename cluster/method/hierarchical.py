@@ -227,8 +227,9 @@ class HierarchicalClustering(BaseClusterMethod):
                 for cell in row:
                     # if we are not on the diagonal (which is always 0)
                     # and if this cell represents a new minimum...
+                    cell_lt_mdist = cell < mindistance if mindistance else False
                     if ((rowindex != cellindex) and
-                            (cell < mindistance or smallestpair is None)):
+                            (cell_lt_mdist or smallestpair is None)):
                         smallestpair = (rowindex, cellindex)
                         mindistance = cell
                     cellindex += 1
