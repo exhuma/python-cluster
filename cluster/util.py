@@ -168,9 +168,30 @@ def dotproduct(a, b):
     return out
 
 
-def centroid(data, method=median):
-    "returns the central vector of a list of vectors"
+def centroid(data, method=median, getter=None, cumulator=None):
+    """
+    returns the central vector of a list of vectors.
+
+    :param data: The container of values.
+    :param method: A accumulation function (usually ``median`` or ``mean``)
+    :param getter: A method to access the data field of custom objects.
+    """
     out = []
+    if not data:
+        return None
+
+    if getter and cumulator:
+        raise ValueError('You should only supply either a cumulator or getter '
+                         'function! Not both!')
+
+    if getter:
+        extracted_data = [getter(_) for _ in data]
+        if isinstance(extracted_data[0], int):
+            return method(extracted_data)
+        else:
+            result = (method(x) for x in zip(*[getter(_) for _ in data]))
+            return tuple(result)
+
     for i in range(len(data[0])):
         out.append(method([x[i] for x in data]))
     return tuple(out)

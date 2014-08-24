@@ -15,15 +15,19 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-from cluster import (HierarchicalClustering, KMeansClustering, ClusteringError)
 from difflib import SequenceMatcher
+from os import urandom
+from random import randint
 import unittest
+
 try:
     import numpy
     NUMPY_AVAILABLE = True
 except:
     NUMPY_AVAILABLE = False
 
+from cluster import (HierarchicalClustering, KMeansClustering, ClusteringError)
+import cluster.util as util
 
 def compare_list(x, y):
     """
@@ -44,6 +48,18 @@ def compare_list(x, y):
         all_ok &= cset in cmpx
 
     return all_ok
+
+
+class MyObject(object):
+    """
+    A custom data object used in some tests.
+    """
+    def __init__(self, value, uid=None):
+        self.value = value
+        self.uid = uid or urandom(10).encode('base64').strip()
+
+    def __repr__(self):
+        return 'MyObject({!r}, {!r})'.format(self.value, self.uid)
 
 
 class HClusterSmallListTestCase(unittest.TestCase):
@@ -215,6 +231,57 @@ class KClusterSFBugs(unittest.TestCase):
         cl = KMeansClustering(data, lambda p0, p1: (
             p0[0] - p1[0]) ** 2 + (p0[1] - p1[1]) ** 2)
         cl.getclusters(10)
+
+
+class KClusterGithubIssues(unittest.TestCase):
+
+    def test_custom_object_data(self):
+        self.skipTest("temporarily skipped until centroid is solved")
+        data = [MyObject(randint(0, 1000)) for _ in range(40)]
+        cl = KMeansClustering(data, lambda x, y: float(abs(x.value-y.value)))
+        clustered = cl.getclusters(10)
+        print(clustered)
+        self.fail()
+
+
+class TestUtils(unittest.TestCase):
+
+    def test_default_centroid(self):
+        result = util.centroid([
+            (1, 2, 3),
+            (2, 3, 4),
+            (3, 4, 5),
+            (4, 5, 6),
+        ])
+        self.assertEqual(result, (2.5, 3.5, 4.5))
+
+    def test_custom_centroid_fold(self):
+        result = util.centroid([
+            MyObject((1, 2, 3), 1),
+            MyObject((2, 3, 4), 2),
+            MyObject((3, 4, 5), 3),
+            MyObject((4, 5, 6), 4),
+        ])
+        self.assertEqual(result, (2.5, 3.5, 4.5))
+
+    def test_custom_centroid_getter(self):
+        result = util.centroid([
+            MyObject((1, 2, 3), 1),
+            MyObject((2, 3, 4), 2),
+            MyObject((3, 4, 5), 3),
+            MyObject((4, 5, 6), 4),
+        ], getter=lambda x: x.value)
+        self.assertEqual(result, (2.5, 3.5, 4.5))
+
+    def test_custom2_centroid_getter(self):
+        result = util.centroid([
+            MyObject(1, 1),
+            MyObject(2, 2),
+            MyObject(3, 3),
+            MyObject(4, 4),
+        ], getter=lambda x: x.value)
+        self.assertEqual(result, 2.5)
+
 
 
 @unittest.skipUnless(NUMPY_AVAILABLE,
