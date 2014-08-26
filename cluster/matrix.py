@@ -6,7 +6,7 @@ from multiprocessing import Process, Queue, current_process
 logger = logging.getLogger(__name__)
 
 
-class ItemItemMatrix(object):
+class Matrix(object):
     """Object representation of the item-item matrix
     """
 
@@ -43,7 +43,6 @@ class ItemItemMatrix(object):
         if self.use_multiprocessing:
             self.task_queue = Queue()
             self.done_queue = Queue()
-        self.genmatrix()
 
     def worker(self):
         """Multiprocessing task function run by worker processes
@@ -52,8 +51,10 @@ class ItemItemMatrix(object):
         for task in iter(self.task_queue.get, 'STOP'):
             col_index, item, item2 = task
             result = (col_index, self.combinfunc(item, item2))
+            self.task_queue.task_done()
             self.done_queue.put(result)
             tasks_completed += 1
+        self.task_queue.task_done()
         logger.info("Worker %s performed %s tasks",
                     current_process().name,
                     tasks_completed)
@@ -66,7 +67,7 @@ class ItemItemMatrix(object):
 
         if self.use_multiprocessing:
             logger.info("Spinning up %s workers", self.num_processes)
-            processes = [Process(target=self.worker) for i in xrange(self.num_processes)]
+            processes = [Process(target=self.worker) for i in range(self.num_processes)]
             [process.start() for process in processes]
 
         for row_index, item in enumerate(self.data):
@@ -96,6 +97,7 @@ class ItemItemMatrix(object):
                     # blocking operation)
                     if num_tasks_queued > self.num_processes:
                         col_index, result = self.done_queue.get()
+                        self.done_queue.task_done()
                         row[col_index] = result
                         num_tasks_completed += 1
                 else:
@@ -114,20 +116,21 @@ class ItemItemMatrix(object):
                 # Grab the remaining worker task results
                 while num_tasks_completed < num_tasks_queued:
                     col_index, result = self.done_queue.get()
+                    self.done_queue.task_done()
                     row[col_index] = result
                     num_tasks_completed += 1
 
-            row_indexed = [row[index] for index in xrange(len(self.data))]
+            row_indexed = [row[index] for index in range(len(self.data))]
             self.matrix.append(row_indexed)
 
         if self.use_multiprocessing:
             logger.info("Stopping/joining %s workers", self.num_processes)
-            [self.task_queue.put('STOP') for i in xrange(self.num_processes)]
+            [self.task_queue.put('STOP') for i in range(self.num_processes)]
             [process.join() for process in processes]
 
         logger.info("Matrix generated")
 
-    def printmatrix(self):
+    def __str__(self):
         """
         Prints out a 2-dimensional list of data cleanly.
         This is useful for debugging.
@@ -141,8 +144,7 @@ class ItemItemMatrix(object):
         for col in self.data:
             for cell in col:
                 maxlen = max(len(str(cell)), maxlen)
-        # print data
         format = " %%%is |" % maxlen
         format = "|" + format * colcount
-        for row in self.data:
-            print format % tuple(row)
+        rows = [format % tuple(row) for row in self.data]
+        return "\n".join(rows)
