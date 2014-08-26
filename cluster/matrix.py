@@ -10,7 +10,7 @@ class Matrix(object):
     """Object representation of the item-item matrix
     """
 
-    def __init__(self, data, combinfunc, symmetric=False, diagonal=None, num_processes=1):
+    def __init__(self, data, combinfunc, symmetric=False, diagonal=None):
         """Takes a list of data and generates a 2D-matrix using the supplied
         combination function to calculate the values.
 
@@ -28,21 +28,11 @@ class Matrix(object):
                           could be the function "x-y". Then each diagonal cell
                           will be "0".  If this value is set to None, then the
                           diagonal will be calculated.  Default: None
-            num_processes
-                        - If you want to use multiprocessing to split up the work
-                          and run combinfunc() in parallel, specify num_processes
-                          > 1 and this number of workers will be spun up, the work
-                          split up amongst them evenly. Default: 1
         """
         self.data = data
         self.combinfunc = combinfunc
         self.symmetric = symmetric
         self.diagonal = diagonal
-        self.num_processes = num_processes
-        self.use_multiprocessing = num_processes > 1
-        if self.use_multiprocessing:
-            self.task_queue = Queue()
-            self.done_queue = Queue()
 
     def worker(self):
         """Multiprocessing task function run by worker processes
@@ -59,15 +49,29 @@ class Matrix(object):
                     current_process().name,
                     tasks_completed)
 
-    def genmatrix(self):
+    def genmatrix(self, num_processes=1):
+        """Actually generate the matrix
+
+        PARAMETERS
+            num_processes
+                        - If you want to use multiprocessing to split up the work
+                          and run combinfunc() in parallel, specify num_processes
+                          > 1 and this number of workers will be spun up, the work
+                          split up amongst them evenly. Default: 1
+        """
+        use_multiprocessing = num_processes > 1
+        if use_multiprocessing:
+            self.task_queue = Queue()
+            self.done_queue = Queue()
+
         self.matrix = []
         logger.info("Generating matrix for %s items - O(n^2)", len(self.data))
-        if self.use_multiprocessing:
-            logger.info("Using multiprocessing on %s processes!", self.num_processes)
+        if use_multiprocessing:
+            logger.info("Using multiprocessing on %s processes!", num_processes)
 
-        if self.use_multiprocessing:
-            logger.info("Spinning up %s workers", self.num_processes)
-            processes = [Process(target=self.worker) for i in range(self.num_processes)]
+        if use_multiprocessing:
+            logger.info("Spinning up %s workers", num_processes)
+            processes = [Process(target=self.worker) for i in range(num_processes)]
             [process.start() for process in processes]
 
         for row_index, item in enumerate(self.data):
@@ -76,7 +80,7 @@ class Matrix(object):
                          len(self.data),
                          100.0 * row_index / len(self.data))
             row = {}
-            if self.use_multiprocessing:
+            if use_multiprocessing:
                 num_tasks_queued = num_tasks_completed = 0
             for col_index, item2 in enumerate(self.data):
                 if self.diagonal is not None and col_index == row_index:
@@ -88,14 +92,14 @@ class Matrix(object):
                     pass
                 # Otherwise, this cell is not on the diagonal and we do indeed
                 # need to call combinfunc()
-                elif self.use_multiprocessing:
+                elif use_multiprocessing:
                     # Add that thing to the task queue!
                     self.task_queue.put((col_index, item, item2))
                     num_tasks_queued += 1
                     # Start grabbing the results as we go, so as not to stuff all of
                     # the worker args into memory at once (as Queue.get() is a
                     # blocking operation)
-                    if num_tasks_queued > self.num_processes:
+                    if num_tasks_queued > num_processes:
                         col_index, result = self.done_queue.get()
                         self.done_queue.task_done()
                         row[col_index] = result
@@ -112,7 +116,7 @@ class Matrix(object):
                     # post-process symmetric "lower left triangle"
                     row[col_index] = self.matrix[col_index][row_index]
 
-            if self.use_multiprocessing:
+            if use_multiprocessing:
                 # Grab the remaining worker task results
                 while num_tasks_completed < num_tasks_queued:
                     col_index, result = self.done_queue.get()
@@ -123,9 +127,9 @@ class Matrix(object):
             row_indexed = [row[index] for index in range(len(self.data))]
             self.matrix.append(row_indexed)
 
-        if self.use_multiprocessing:
-            logger.info("Stopping/joining %s workers", self.num_processes)
-            [self.task_queue.put('STOP') for i in range(self.num_processes)]
+        if use_multiprocessing:
+            logger.info("Stopping/joining %s workers", num_processes)
+            [self.task_queue.put('STOP') for i in range(num_processes)]
             [process.join() for process in processes]
 
         logger.info("Matrix generated")
