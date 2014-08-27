@@ -18,8 +18,9 @@
 import logging
 
 from cluster.cluster import Cluster
+from cluster.matrix import Matrix
 from cluster.method.base import BaseClusterMethod
-from cluster.util import median, mean, genmatrix
+from cluster.util import median, mean
 
 
 logger = logging.getLogger(__name__)
@@ -41,11 +42,17 @@ class HierarchicalClustering(BaseClusterMethod):
         Note that all of the returned clusters are more that 90 apart
     """
 
-    def __init__(self, data, distance_function, linkage=None):
+    def __init__(self, data, distance_function, linkage=None, num_processes=1):
         """
         Constructor
 
         See BaseClusterMethod.__init__ for more details.
+
+            num_processes
+                     - If you want to use multiprocessing to split up the work
+                       and run genmatrix() in parallel, specify num_processes
+                       > 1 and this number of workers will be spun up, the work
+                       split up amongst them evenly. Default: 1
         """
         if not linkage:
             linkage = 'single'
@@ -53,6 +60,7 @@ class HierarchicalClustering(BaseClusterMethod):
                     "method %s", linkage)
         BaseClusterMethod.__init__(self, data, distance_function)
         self.set_linkage_method(linkage)
+        self.num_processes = num_processes
         self.__cluster_created = False
 
     def set_linkage_method(self, method):
@@ -216,7 +224,12 @@ class HierarchicalClustering(BaseClusterMethod):
         # if the matrix only has two rows left, we are done
         while len(matrix) > 2 or matrix == []:
 
-            matrix = genmatrix(self._data, self.linkage, True, 0)
+            item_item_matrix = Matrix(self._data,
+                                      self.linkage,
+                                      True,
+                                      0)
+            item_item_matrix.genmatrix(self.num_processes)
+            matrix = item_item_matrix.matrix
 
             smallestpair = None
             mindistance = None
