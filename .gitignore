@@ -1,6 +1,8 @@
 *.pyc
+/*.egg-info
 /MANIFEST
 /build
 /dist
+/docs/_build
 /env
 /env3

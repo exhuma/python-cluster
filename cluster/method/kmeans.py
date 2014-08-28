@@ -21,30 +21,29 @@ from cluster.util import ClusteringError, centroid, minkowski_distance
 
 class KMeansClustering(object):
     """
-    Implementation of the kmeans clustering method as explained in
-    http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/kmeans.html
+    Implementation of the kmeans clustering method as explained in a tutorial_
+    by *matteucc*.
 
-    USAGE
-    =====
+    .. _tutorial: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/kmeans.html
+
+    Example:
 
       >>> from cluster import KMeansClustering
       >>> cl = KMeansClustering([(1,1), (2,1), (5,3), ...])
       >>> clusters = cl.getclusters(2)
+
+    :param data: A list of tuples or integers.
+    :param distance: A function determining the distance between two items.
+        Default (if ``None`` is passed): It assumes the tuples contain numeric
+        values and appiles a generalised form of the euclidian-distance
+        algorithm on them.
+    :param equality: A function to test equality of items. By default the
+        standard python equality operator (``==``) is applied.
+    :raises ValueError: if the list contains heterogeneous items or if the
+        distance between items cannot be determined.
     """
 
     def __init__(self, data, distance=None, equality=None):
-        """
-        Constructor
-
-        PARAMETERS
-            data     - A list of tuples or integers.
-            distance - A function determining the distance between two items.
-                       Default: It assumes the tuples contain numeric values
-                                and appiles a generalised form of the
-                                euclidian-distance algorithm on them.
-            equality - A function to test equality of items. By default the
-                       standard python equality operator (``==``) is applied.
-        """
         self.__clusters = []
         self.__data = data
         self.distance = distance
@@ -71,11 +70,11 @@ class KMeansClustering(object):
 
     def getclusters(self, count):
         """
-        Generates <count> clusters
+        Generates *count* clusters.
 
-        PARAMETERS
-            count - The amount of clusters that should be generated.
-                    count must be greater than 1
+        :param count: The amount of clusters that should be generated.  count
+            must be greater than ``1``.
+        :raises ClusteringError: if *count* is out of bounds.
         """
 
         # only proceed if we got sensible input
@@ -113,11 +112,10 @@ class KMeansClustering(object):
 
     def assign_item(self, item, origin):
         """
-        Assigns an item from a given cluster to the closest located cluster
+        Assigns an item from a given cluster to the closest located cluster.
 
-        PARAMETERS
-            item   - the item to be moved
-            origin - the originating cluster
+        :param item: the item to be moved.
+        :param origin: the originating cluster.
         """
         closest_cluster = origin
         for cluster in self.__clusters:
@@ -133,13 +131,11 @@ class KMeansClustering(object):
 
     def move_item(self, item, origin, destination):
         """
-        Moves an item from one cluster to anoter cluster
+        Moves an item from one cluster to anoter cluster.
 
-        PARAMETERS
-
-            item        - the item to be moved
-            origin      - the originating cluster
-            destination - the target cluster
+        :param item: the item to be moved.
+        :param origin: the originating cluster.
+        :param destination: the target cluster.
         """
         if self.equality:
             item_index = 0
@@ -154,12 +150,11 @@ class KMeansClustering(object):
 
     def initialise_clusters(self, input_, clustercount):
         """
-        Initialises the clusters by distributing the items from the data
+        Initialises the clusters by distributing the items from the data.
         evenly across n clusters
 
-        PARAMETERS
-            input_       - the data set (a list of tuples)
-            clustercount - the amount of clusters (n)
+        :param input_: the data set (a list of tuples).
+        :param clustercount: the amount of clusters (n).
         """
         # initialise the clusters with empty lists
         self.__clusters = []

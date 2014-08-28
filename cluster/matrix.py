@@ -1,3 +1,20 @@
+#
+# This is part of "python-cluster". A library to group similar items together.
+# Copyright (C) 2006    Michel Albert
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as published by the
+# Free Software Foundation; either version 2.1 of the License, or (at your
+# option) any later version.
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+# for more details.
+# You should have received a copy of the GNU Lesser General Public License
+# along with this library; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+
 
 import logging
 from multiprocessing import Process, Queue, current_process
@@ -7,27 +24,26 @@ logger = logging.getLogger(__name__)
 
 
 class Matrix(object):
-    """Object representation of the item-item matrix
+    """
+    Object representation of the item-item matrix.
     """
 
     def __init__(self, data, combinfunc, symmetric=False, diagonal=None):
-        """Takes a list of data and generates a 2D-matrix using the supplied
+        """
+        Takes a list of data and generates a 2D-matrix using the supplied
         combination function to calculate the values.
 
-        PARAMETERS
-            data        - the list of items
-            combinfunc  - the function that is used to calculate teh value in a
-                          cell.  It has to cope with two arguments.
-            symmetric   - Whether it will be a symmetric matrix along the diagonal.
-                          For example, if the list contains integers, and the
-                          combination function is abs(x-y), then the matrix will
-                          be symmetric.
-                          Default: False
-            diagonal    - The value to be put into the diagonal. For some
-                          functions, the diagonal will stay constant. An example
-                          could be the function "x-y". Then each diagonal cell
-                          will be "0".  If this value is set to None, then the
-                          diagonal will be calculated.  Default: None
+        :param data: the list of items.
+        :param combinfunc: the function that is used to calculate teh value in a
+            cell. It has to cope with two arguments.
+        :param symmetric: Whether it will be a symmetric matrix along the
+            diagonal.  For example, if the list contains integers, and the
+            combination function is ``abs(x-y)``, then the matrix will be
+            symmetric.
+        :param diagonal: The value to be put into the diagonal. For some
+            functions, the diagonal will stay constant. An example could be the
+            function ``x-y``. Then each diagonal cell will be ``0``.  If this
+            value is set to None, then the diagonal will be calculated.
         """
         self.data = data
         self.combinfunc = combinfunc
@@ -35,7 +51,8 @@ class Matrix(object):
         self.diagonal = diagonal
 
     def worker(self):
-        """Multiprocessing task function run by worker processes
+        """
+        Multiprocessing task function run by worker processes
         """
         tasks_completed = 0
         for task in iter(self.task_queue.get, 'STOP'):
@@ -50,14 +67,13 @@ class Matrix(object):
                     tasks_completed)
 
     def genmatrix(self, num_processes=1):
-        """Actually generate the matrix
+        """
+        Actually generate the matrix
 
-        PARAMETERS
-            num_processes
-                        - If you want to use multiprocessing to split up the work
-                          and run combinfunc() in parallel, specify num_processes
-                          > 1 and this number of workers will be spun up, the work
-                          split up amongst them evenly. Default: 1
+        :param num_processes: If you want to use multiprocessing to split up the
+            work and run ``combinfunc()`` in parallel, specify
+            ``num_processes > 1`` and this number of workers will be spun up,
+            the work is split up amongst them evenly.
         """
         use_multiprocessing = num_processes > 1
         if use_multiprocessing:
@@ -136,11 +152,8 @@ class Matrix(object):
 
     def __str__(self):
         """
-        Prints out a 2-dimensional list of data cleanly.
-        This is useful for debugging.
-
-        PARAMETERS
-            data  -  the 2D-list to display
+        Returns a 2-dimensional list of data as text-string which can be
+        displayed to the user.
         """
         # determine maximum length
         maxlen = 0
