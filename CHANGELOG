@@ -1,4 +1,5 @@
 1.2.0
+   - Python 3 support
    - Split up one big file into smaller more logical sub-modules
 
 1.1.1b3

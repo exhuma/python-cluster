@@ -88,6 +88,12 @@ class HClusterIntegerTestCase(unittest.TestCase):
                 [518, 564, 542]],
                 cl.getlevel(40))
 
+    def testUnmodifiedData(self):
+        cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
+        new_data = []
+        [new_data.extend(_) for _ in cl.getlevel(40)]
+        self.assertEqual(sorted(new_data), sorted(self.__data))
+
 
 class HClusterStringTestCase(unittest.TestCase):
 
@@ -125,6 +131,12 @@ class HClusterStringTestCase(unittest.TestCase):
                     ['adipiscing']
                     ],
                 cl.getlevel(0.5))
+
+    def testUnmodifiedData(self):
+        cl = HierarchicalClustering(self.__data, self.sim)
+        new_data = []
+        [new_data.extend(_) for _ in cl.getlevel(0.5)]
+        self.assertEqual(sorted(new_data), sorted(self.__data))
 
 
 class KClusterSmallListTestCase(unittest.TestCase):
@@ -192,6 +204,16 @@ class KCluster2DTestCase(unittest.TestCase):
                 cl.getclusters(2),
                 [[(8, 2), (8, 1), (8, 3), (7, 3), (9, 2), (9, 3)],
                  [(3, 5), (1, 5), (3, 4), (2, 6), (2, 5), (3, 6)]])
+
+    def testUnmodifiedData(self):
+        "Basic clustering test"
+        data = [(8, 2), (7, 3), (2, 6), (3, 5), (3, 6), (1, 5), (8, 1), (3,
+            4), (8, 3), (9, 2), (2, 5), (9, 3)]
+        cl = KMeansClustering(data)
+
+        new_data = []
+        [new_data.extend(_) for _ in cl.getclusters(2)]
+        self.assertEqual(sorted(new_data), sorted(data))
 
 
 class KClusterSFBugs(unittest.TestCase):

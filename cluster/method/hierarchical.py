@@ -28,10 +28,13 @@ logger = logging.getLogger(__name__)
 
 class HierarchicalClustering(BaseClusterMethod):
     """
-    Implementation of the hierarchical clustering method as explained in
-    http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
+    Implementation of the hierarchical clustering method as explained in a
+    tutorial_ by *matteucc*.
 
-    USAGE
+    .. _tutorial:: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
+
+    Example:
+
         >>> from cluster import HierarchicalClustering
         >>> # or: from cluster import *
         >>> cl = HierarchicalClustering([123,334,345,242,234,1,3],
@@ -39,21 +42,21 @@ class HierarchicalClustering(BaseClusterMethod):
         >>> cl.getlevel(90)
         [[345, 334], [234, 242], [123], [3, 1]]
 
-        Note that all of the returned clusters are more that 90 apart
+    Note that all of the returned clusters are more than 90 (``getlevel(90)``)
+    apart.
+
+    See :py:class:`~cluster.method.base.BaseClusterMethod` for more details.
+
+    :param linkage: The method used to determine the distance between two
+        clusters. See :py:meth:`~.HierarchicalClustering.set_linkage_method` for
+        the available methods.
+    :param num_processes: If you want to use multiprocessing to split up the
+        work and run ``genmatrix()`` in parallel, specify num_processes > 1 and
+        this number of workers will be spun up, the work split up amongst them
+        evenly.
     """
 
     def __init__(self, data, distance_function, linkage=None, num_processes=1):
-        """
-        Constructor
-
-        See BaseClusterMethod.__init__ for more details.
-
-            num_processes
-                     - If you want to use multiprocessing to split up the work
-                       and run genmatrix() in parallel, specify num_processes
-                       > 1 and this number of workers will be spun up, the work
-                       split up amongst them evenly. Default: 1
-        """
         if not linkage:
             linkage = 'single'
         logger.info("Initializing HierarchicalClustering object with linkage "
@@ -67,9 +70,8 @@ class HierarchicalClustering(BaseClusterMethod):
         """
         Sets the method to determine the distance between two clusters.
 
-        PARAMETERS:
-            method - The name of the method to use. It must be one of 'single',
-                     'complete', 'average' or 'uclus'
+        :param method: The name of the method to use. It must be one of
+            ``'single'``, ``'complete'``, ``'average'`` or ``'uclus'``.
         """
         if method == 'single':
             self.linkage = self.single_linkage_distance
@@ -89,9 +91,8 @@ class HierarchicalClustering(BaseClusterMethod):
         item/cluster. The distance equals to the *average* (median) distance
         from any member of one cluster to any member of the other cluster.
 
-        PARAMETERS
-            x  -  first cluster/item
-            y  -  second cluster/item
+        :param x: first cluster/item.
+        :param y: second cluster/item.
         """
         # create a flat list of all the items in <x>
         if not isinstance(x, Cluster):
@@ -117,9 +118,8 @@ class HierarchicalClustering(BaseClusterMethod):
         item/cluster. The distance equals to the *average* (mean) distance
         from any member of one cluster to any member of the other cluster.
 
-        PARAMETERS
-            x - first cluster/item
-            y - second cluster/item
+        :param x: first cluster/item.
+        :param y: second cluster/item.
         """
         # create a flat list of all the items in <x>
         if not isinstance(x, Cluster):
@@ -145,9 +145,8 @@ class HierarchicalClustering(BaseClusterMethod):
         item/cluster. The distance equals to the *longest* distance from any
         member of one cluster to any member of the other cluster.
 
-        PARAMETERS
-            x - first cluster/item
-            y - second cluster/item
+        :param x: first cluster/item.
+        :param y: second cluster/item.
         """
 
         # create a flat list of all the items in <x>
@@ -176,9 +175,8 @@ class HierarchicalClustering(BaseClusterMethod):
         item/cluster. The distance equals to the *shortest* distance from any
         member of one cluster to any member of the other cluster.
 
-        PARAMETERS
-            x - first cluster/item
-            y - second cluster/item
+        :param x: first cluster/item.
+        :param y: second cluster/item.
         """
 
         # create a flat list of all the items in <x>
@@ -203,15 +201,12 @@ class HierarchicalClustering(BaseClusterMethod):
 
     def cluster(self, matrix=None, level=None, sequence=None):
         """
-        Perform hierarchical clustering. This method is automatically called
-        by the constructor so you should not need to call it explicitly.
+        Perform hierarchical clustering.
 
-        PARAMETERS
-            matrix   -  The 2D list that is currently under processing. The
-                        matrix contains the distances of each item with each
-                        other
-            level    -  The current level of clustering
-            sequence -  The sequence number of the clustering
+        :param matrix: The 2D list that is currently under processing. The
+            matrix contains the distances of each item with each other
+        :param level: The current level of clustering
+        :param sequence: The sequence number of the clustering
         """
         logger.info("Performing cluster()")
 
@@ -240,8 +235,9 @@ class HierarchicalClustering(BaseClusterMethod):
                 for cell in row:
                     # if we are not on the diagonal (which is always 0)
                     # and if this cell represents a new minimum...
+                    cell_lt_mdist = cell < mindistance if mindistance else False
                     if ((rowindex != cellindex) and
-                            (cell < mindistance or smallestpair is None)):
+                            (cell_lt_mdist or smallestpair is None)):
                         smallestpair = (rowindex, cellindex)
                         mindistance = cell
                     cellindex += 1
@@ -272,14 +268,12 @@ class HierarchicalClustering(BaseClusterMethod):
 
     def getlevel(self, threshold):
         """
-        Returns all clusters with a maximum distance of <threshold> in between
+        Returns all clusters with a maximum distance of *threshold* in between
         each other
 
-        PARAMETERS
-            threshold - the maximum distance between clusters
+        :param threshold: the maximum distance between clusters.
 
-        SEE-ALSO
-            Cluster.getlevel(threshold)
+        See :py:meth:`~cluster.cluster.Cluster.getlevel`
         """
 
         # if it's not worth clustering, just return the data

@@ -19,33 +19,27 @@
 class BaseClusterMethod(object):
     """
     The base class of all clustering methods.
-    """
 
-    def __init__(self, input, distance_function):
-        """
-        Constructs the object and starts clustering
+    :param input: a list of objects
+    :distance_function: a function returning the distance - or opposite of
+        similarity ``(distance = -similarity)`` - of two items from the input.
+        In other words, the closer the two items are related, the smaller this
+        value needs to be.  With 0 meaning they are exactly the same.
 
-        PARAMETERS
-            input             - a list of objects
-            distance_function - a function returning the distance - or
-                                opposite of similarity ( distance =
-                                -similarity ) - of two items from the input.
-                                In other words, the closer the two items are
-                                related, the smaller this value needs to be.
-                                With 0 meaning they are exactly the same.
-
-        NOTES
-            The distance function should always return the absolute distance
-            between two given items of the list. Say,
+    .. note::
+        The distance function should always return the absolute distance between
+        two given items of the list. Say::
 
             distance(input[1], input[4]) = distance(input[4], input[1])
 
-            This is very important for the clustering algorithm to work!
-            Naturally, the data returned by the distance function MUST be a
-            comparable datatype, so you can perform arithmetic comparisons on
-            them (< or >)! The simplest examples would be floats or ints. But
-            as long as they are comparable, it's ok.
-        """
+        This is very important for the clustering algorithm to work!  Naturally,
+        the data returned by the distance function MUST be a comparable
+        datatype, so you can perform arithmetic comparisons on them (``<`` or
+        ``>``)! The simplest examples would be floats or ints. But as long as
+        they are comparable, it's ok.
+    """
+
+    def __init__(self, input, distance_function):
         self.distance = distance_function
         self._input = input    # the original input
         self._data = input[:]  # clone the input so we can work with it
@@ -55,7 +49,7 @@ class BaseClusterMethod(object):
         """
         Returns the structure (topology) of the cluster.
 
-        See Cluster.topology() for information.
+        See :py:meth:`~cluster.cluster.Cluster.topology` for more information.
         """
         return self.data[0].topology()
 

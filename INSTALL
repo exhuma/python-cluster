@@ -1,44 +1,27 @@
 INSTALLATION
 ============
 
-Linux
------
+Simply run::
 
-RPM-Installation
-~~~~~~~~~~~~~~~~
+    pip install cluster
 
-I'm not familiar with RPM-distributions but as far as I know it should be
-something like::
+Or, if you run it in a virtualenv:
 
-   rpm -i <filename.rpm>
+    /path/to/your/env/bin/pip install cluster
 
-RPM-source Installation
-~~~~~~~~~~~~~~~~~~~~~~~
 
-This is something I don't know. If somebody can enlighten me, please do!
+Source installation
+~~~~~~~~~~~~~~~~~~~
 
-Binary/Source installation
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Untar the archive::
 
-Untar the package with you favourite archive tool. On the console it will be
-something along the lines::
-
-   tar xzf <filename.tar.gz>
+   tar xf <filename.tar.gz>
 
 Next, go to the folder just created. It will have the same name as the package
-(for example "cluster-1.0.0b1") and run::
+(for example "cluster-1.2.0") and run::
 
-   python setup.py install
+    python setup.py install
 
-For this step you need root-priviledges
+This will require superuser privileges unless you install it in a virtual environment::
 
-Windows
--------
-
-Execute the executable file and follow the instructions displayed. Default
-values will be fine in most cases.
-
-MacOS-X
--------
-
-Simply follow the same instructions as with the Linux-Source installation.
+    /path/to/your/env/bin/python setup.py install

@@ -15,6 +15,12 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+from __future__ import print_function
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 class ClusteringError(Exception):
     pass
@@ -23,8 +29,11 @@ class ClusteringError(Exception):
 def flatten(L):
     """
     Flattens a list.
+
     Example:
-    flatten([a,b,[c,d,[e,f]]]) = [a,b,c,d,e,f]
+
+    >>> flatten([a,b,[c,d,[e,f]]])
+    [a,b,c,d,e,f]
     """
     if not isinstance(L, list):
         return [L]
@@ -62,18 +71,16 @@ def minkowski_distance(x, y, p=2):
     """
     Calculates the minkowski distance between two points.
 
-    PARAMETERS
-        x - the first point
-        y - the second point
-        p - the order of the minkowski algorithm.
-            This is equal to the euclidian distance.  If the order is 1, it is
-            equal to the manhatten distance.
-            The higher the order, the closer it converges to the Chebyshev
-            distance, which has p=infinity. Default = 2.
+    :param x: the first point
+    :param y: the second point
+    :param p: the order of the minkowski algorithm. If *p=1* it is equal
+        to the manhatten distance, if *p=2* it is equal to the euclidian
+        distance. The higher the order, the closer it converges to the
+        Chebyshev distance, which has *p=infinity*.
     """
     from math import pow
     assert len(y) == len(x)
-    assert x >= 1
+    assert len(x) >= 1
     sum = 0
     for i in range(len(x)):
         sum += abs(x[i] - y[i]) ** p
