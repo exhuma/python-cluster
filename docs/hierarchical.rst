@@ -34,14 +34,14 @@ So we have the following points::
 
 .. note::
 
-    To keep the table more readable, individual points are written in
+    To keep the matrix table more readable, individual points are written in
     lower-case, while clusters are written in upper-case!
 
 
-This results in the following distance matrix. We will mark the diagonal with
-an ``x`` as we're not interested in comparing a point with itself.  Equally, we
-are only interested in the absolute distance. So we only need the values for
-pairs on ons side of the diagonal.
+This results in the following initial distance matrix. We will mark the
+diagonal with an ``x`` as we're not interested in comparing a point with
+itself.  Equally, we are only interested in the absolute distance. So we only
+need the values for pairs on ons side of the diagonal.
 
 
  ===== ===== ====== ====== ====== ====== ======
@@ -72,6 +72,10 @@ pairs on ons side of the diagonal.
    d                         x     2.00
    f                                x
  ===== ===== ====== ====== ====== ======
+
+
+Single Linkage
+--------------
 
 The next candidate is ``[c, d]`` as ``B``::
 
@@ -135,3 +139,68 @@ The end-result is the following dendogram::
         |     |      |     |      |      |
         e     b      c     d      f      a
 
+
+
+Complete Linkage
+----------------
+
+Initial distance matrix for reference:
+
+ ===== ===== ====== ====== ====== ====== ======
+         a     b      c      d      e      f
+   a     x    8.00   1.41   2.24   8.06   3.61
+   b           x     7.07   6.08   1.00   6.71
+   c                  x     1.00   7.00   2.24
+   d                         x     6.00   2.00
+   e                                x     6.32
+   f                                       x
+ ===== ===== ====== ====== ====== ====== ======
+
+First iteration is identical, but distance matrix has different values. The
+subsequent steps will be displayed without aditional explanation, the idea is
+the same as above, simply using a different linkage function.
+
+ ===== ===== ====== ====== ====== ======
+         a     A      c      d      f
+   a     x    8.06   1.41   2.24   3.61
+   A           x     7.07   6.08   6.71
+   c                  x     1.00   2.24
+   d                         x     2.00
+   f                                x
+ ===== ===== ====== ====== ====== ======
+
+
+ ===== ===== ====== ====== ======
+         a     A      B      f
+   a     x    8.06   2.24   3.61
+   A           x     7.07   6.71
+   B                  x     2.24
+   f                         x
+ ===== ===== ====== ====== ======
+
+.. note::
+    We now have to make a choice. I have not yet decided on how to handle this
+    situation to have a detereministic behaviour. My current train of thought
+    is using python ``sets`` as data-structure which is unordered. So the
+    algorithm could return either one here. I'll turn to a matematician to get
+    some better information.
+
+    For a demonstration, we'll pick ``[Ba]`` as to have a different result from
+    sinle linkage...
+
+This will give us:
+
+ ===== ===== ====== ======
+         C     A      f
+   C     x    8.06   3.61
+   A           x     6.71
+   f                  x
+ ===== ===== ====== ======
+
+And finally
+
+ ===== ===== ======
+         D     A
+   D     x    8.06
+   A           x
+ ===== ===== ======
