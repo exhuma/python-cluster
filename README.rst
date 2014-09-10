@@ -2,7 +2,7 @@ DESCRIPTION
 ===========
 
 .. image:: https://readthedocs.org/projects/python-cluster/badge/?version=latest
-    :target: https://readthedocs.org/projects/python-cluster/?badge=latest
+    :target: http://python-cluster.readthedocs.org
     :alt: Documentation Status
 
 python-cluster is a "simple" package that allows to create several groups
@@ -51,5 +51,5 @@ The parameter passed to getclusters is the count of clusters generated.
 
 
 .. image:: https://readthedocs.org/projects/python-cluster/badge/?version=latest
-    :target: https://readthedocs.org/projects/python-cluster/?badge=latest
+    :target: http://python-cluster.readthedocs.org
     :alt: Documentation Status
