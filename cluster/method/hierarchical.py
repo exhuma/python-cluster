@@ -61,7 +61,7 @@ class HierarchicalClustering(BaseClusterMethod):
             linkage = 'single'
         logger.info("Initializing HierarchicalClustering object with linkage "
                     "method %s", linkage)
-        BaseClusterMethod.__init__(self, data, distance_function)
+        BaseClusterMethod.__init__(self, sorted(data), distance_function)
         self.set_linkage_method(linkage)
         self.num_processes = num_processes
         self.__cluster_created = False
