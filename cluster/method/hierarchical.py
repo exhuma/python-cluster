@@ -31,7 +31,7 @@ class HierarchicalClustering(BaseClusterMethod):
     Implementation of the hierarchical clustering method as explained in a
     tutorial_ by *matteucc*.
 
-    .. _tutorial:: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
+    .. _tutorial: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
 
     Example:
 
