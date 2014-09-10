@@ -37,10 +37,10 @@ Note, that when you retrieve a set of clusters, it immediately starts the
 clustering process, which is quite complex. If you intend to create clusters
 from a large dataset, consider doing that in a separate thread.
 
-For K-Means clustering it would look like this:
+For K-Means clustering it would look like this::
 
-     >>> from cluster import KMeansClustering
-     >>> cl = KMeansClustering([(1,1), (2,1), (5,3), ...])
-     >>> clusters = cl.getclusters(2)
+    >>> from cluster import KMeansClustering
+    >>> cl = KMeansClustering([(1,1), (2,1), (5,3), ...])
+    >>> clusters = cl.getclusters(2)
 
 The parameter passed to getclusters is the count of clusters generated.
