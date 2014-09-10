@@ -71,22 +71,28 @@ class HClusterIntegerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.__data = [791, 956, 676, 124, 564, 84, 24, 365, 594, 940, 398,
-                            971, 131, 365, 542, 336, 518, 835, 134, 391]
+                       971, 131, 365, 542, 336, 518, 835, 134, 391]
 
     def testCluster(self):
         "Basic Hierarchical Clustering test with integers"
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
         cl.cluster()
         self.assertEqual([
-                [24],
-                [84, 124, 131, 134],
-                [336, 365, 365, 365, 398, 391],
-                [940, 956, 971],
-                [791],
-                [835],
-                [676],
-                [518, 564, 542]],
-                cl.getlevel(40))
+            [24],
+            [84, 124, 131, 134],
+            [336, 365, 365, 391, 398],
+            [676],
+            [594, 518, 542, 564],
+            [940, 956, 971],
+            [791],
+            [835],
+        ], cl.getlevel(40))
+
+    def testUnmodifiedData(self):
+        cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
+        new_data = []
+        [new_data.extend(_) for _ in cl.getlevel(40)]
+        self.assertEqual(sorted(new_data), sorted(self.__data))
 
 
 class HClusterStringTestCase(unittest.TestCase):
@@ -96,9 +102,9 @@ class HClusterStringTestCase(unittest.TestCase):
         return 1 - sm.ratio()
 
     def setUp(self):
-        self.__data = ("Lorem ipsum dolor sit amet, consectetuer adipiscing "
-                "elit. Ut elit. Phasellus consequat ultricies mi. Sed congue "
-                "leo at neque. Nullam."). split()
+        self.__data = ("Lorem ipsum dolor sit amet consectetuer adipiscing "
+                       "elit Ut elit Phasellus consequat ultricies mi Sed "
+                       "congue leo at neque Nullam").split()
 
     def testDataTypes(self):
         "Test for bug #?"
@@ -112,19 +118,23 @@ class HClusterStringTestCase(unittest.TestCase):
         "Basic Hierachical clustering test with strings"
         cl = HierarchicalClustering(self.__data, self.sim)
         self.assertEqual([
-                    ['Nullam.'],
-                    ['Sed'],
-                    ['mi.'],
-                    ['ultricies'],
-                    ['Phasellus'],
-                    ['amet,', 'at'],
-                    ['sit', 'elit.', 'elit.', 'elit.'],
-                    ['leo', 'Lorem', 'dolor'],
-                    ['neque.', 'congue', 'consectetuer', 'consequat'],
-                    ['ipsum'],
-                    ['adipiscing']
-                    ],
-                cl.getlevel(0.5))
+            ['ultricies'],
+            ['Sed'],
+            ['Phasellus'],
+            ['mi'],
+            ['Nullam'],
+            ['sit', 'elit', 'elit', 'Ut', 'amet', 'at'],
+            ['leo', 'Lorem', 'dolor'],
+            ['congue', 'neque', 'consectetuer', 'consequat'],
+            ['adipiscing'],
+            ['ipsum'],
+        ], cl.getlevel(0.5))
+
+    def testUnmodifiedData(self):
+        cl = HierarchicalClustering(self.__data, self.sim)
+        new_data = []
+        [new_data.extend(_) for _ in cl.getlevel(0.5)]
+        self.assertEqual(sorted(new_data), sorted(self.__data))
 
 
 class KClusterSmallListTestCase(unittest.TestCase):
@@ -193,6 +203,16 @@ class KCluster2DTestCase(unittest.TestCase):
                 [[(8, 2), (8, 1), (8, 3), (7, 3), (9, 2), (9, 3)],
                  [(3, 5), (1, 5), (3, 4), (2, 6), (2, 5), (3, 6)]])
 
+    def testUnmodifiedData(self):
+        "Basic clustering test"
+        data = [(8, 2), (7, 3), (2, 6), (3, 5), (3, 6), (1, 5), (8, 1), (3,
+            4), (8, 3), (9, 2), (2, 5), (9, 3)]
+        cl = KMeansClustering(data)
+
+        new_data = []
+        [new_data.extend(_) for _ in cl.getclusters(2)]
+        self.assertEqual(sorted(new_data), sorted(data))
+
 
 class KClusterSFBugs(unittest.TestCase):
 
@@ -234,9 +254,9 @@ if __name__ == '__main__':
         unittest.makeSuite(HClusterSmallListTestCase),
         unittest.makeSuite(HClusterStringTestCase),
         unittest.makeSuite(KCluster2DTestCase),
-        unittest.makeSuite(KClusterSFBugs)),
+        unittest.makeSuite(KClusterSFBugs),
         unittest.makeSuite(KClusterSmallListTestCase),
         unittest.makeSuite(NumpyTests),
-    )
+    ))
 
     unittest.TextTestRunner(verbosity=2).run(suite)

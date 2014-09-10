@@ -1,5 +1,9 @@
 1.2.0
+   - Multiprocessing (by loisaidasam)
+   - Python 3 support
    - Split up one big file into smaller more logical sub-modules
+   - Fixed https://github.com/exhuma/python-cluster/issues/11
+   - Documentation update.
 
 1.1.1b3
    - Fixed bug #1727558

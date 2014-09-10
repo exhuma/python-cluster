@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-readme_contents = open("README").read()
+readme_contents = open("README.rst").read()
 
 # index where the first paragraph starts
 parastart = readme_contents.find('=\n') + 3
@@ -13,7 +13,7 @@ setup(
     version='1.2.0',
     author='Michel Albert',
     author_email='exhuma@users.sourceforge.net',
-    url='http://python-cluster.sourceforge.net/',
+    url='https://github.com/exhuma/python-cluster',
     packages=['cluster', 'cluster.method'],
     license='LGPL',
     description=readme_contents[parastart:sentence_end],

@@ -15,6 +15,8 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+from __future__ import print_function
+
 
 class Cluster(object):
     """
@@ -34,16 +36,13 @@ class Cluster(object):
         """
         Constructor
 
-        PARAMETERS
-            level - The level of this cluster. This is used in hierarchical
-                    clustering to retrieve a specific set of clusters. The
-                    higher the level, the smaller the count of clusters
-                    returned. The level depends on the difference function
-                    used.
-            *args - every additional argument passed following the level value
-                    will get added as item to the cluster. You could also pass
-                    a list as second parameter to initialise the cluster with
-                    that list as content
+        :param level: The level of this cluster. This is used in hierarchical
+            clustering to retrieve a specific set of clusters. The higher the
+            level, the smaller the count of clusters returned. The level depends
+            on the difference function used.
+        :param *args: every additional argument passed following the level value
+            will get added as item to the cluster. You could also pass a list as
+            second parameter to initialise the cluster with that list as content
         """
         self.__level = level
         if len(args) == 0:
@@ -55,8 +54,7 @@ class Cluster(object):
         """
         Appends a new item to the cluster
 
-        PARAMETERS
-            item  -  The item that is to be appended
+        :param item: The item that is to be appended.
         """
         self.__items.append(item)
 
@@ -64,9 +62,8 @@ class Cluster(object):
         """
         Sets or gets the items of the cluster
 
-        PARAMETERS
-            new_items (optional) - if set, the items of the cluster will be
-                                  replaced with that argument.
+        :param new_items: if set, the items of the cluster will be replaced with
+            that argument.
         """
         if new_items is None:
             return self.__items
@@ -80,8 +77,7 @@ class Cluster(object):
         some items of the cluster are clusters in their own right and you only
         want the items.
 
-        PARAMETERS
-            *args - only used for recursion.
+        :param *args: only used for recursion.
         """
         flattened_items = []
         if len(args) == 0:
@@ -99,39 +95,41 @@ class Cluster(object):
 
     def level(self):
         """
-        Returns the level associated with this cluster
+        Returns the level associated with this cluster.
         """
         return self.__level
 
     def display(self, depth=0):
         """
-        Pretty-prints this cluster. Useful for debuging
+        Pretty-prints this cluster. Useful for debuging.
         """
-        print depth * "    " + "[level %s]" % self.__level
+        print(depth * "    " + "[level %s]" % self.__level)
         for item in self.__items:
             if isinstance(item, Cluster):
                 item.display(depth + 1)
             else:
-                print depth * "    " + "%s" % item
+                print(depth * "    " + "%s" % item)
 
     def topology(self):
         """
         Returns the structure (topology) of the cluster as tuples.
 
-        Output from cl.data:
-             [<Cluster@0.833333333333(['CVS',
-             <Cluster@0.818181818182(['34.xls',
-             <Cluster@0.789473684211([<Cluster@0.555555555556(['0.txt',
-             <Cluster@0.181818181818(['ChangeLog', 'ChangeLog.txt'])>])>,
-             <Cluster@0.684210526316(['20060730.py',
-             <Cluster@0.684210526316(['.cvsignore',
-             <Cluster@0.647058823529(['About.py', <Cluster@0.625(['.idlerc',
-             '.pylint.d'])>])>])>])>])>])>])>]
+        Output from cl.data::
 
-        Corresponding output from cl.topo():
-             ('CVS', ('34.xls', (('0.txt', ('ChangeLog', 'ChangeLog.txt')),
-             ('20060730.py', ('.cvsignore', ('About.py',
-             ('.idlerc', '.pylint.d')))))))
+                [<Cluster@0.833333333333(['CVS',
+                 <Cluster@0.818181818182(['34.xls',
+                 <Cluster@0.789473684211([<Cluster@0.555555555556(['0.txt',
+                 <Cluster@0.181818181818(['ChangeLog', 'ChangeLog.txt'])>])>,
+                 <Cluster@0.684210526316(['20060730.py',
+                 <Cluster@0.684210526316(['.cvsignore',
+                 <Cluster@0.647058823529(['About.py', <Cluster@0.625(['.idlerc',
+                 '.pylint.d'])>])>])>])>])>])>])>]
+
+        Corresponding output from cl.topo()::
+
+                ('CVS', ('34.xls', (('0.txt', ('ChangeLog', 'ChangeLog.txt')),
+                ('20060730.py', ('.cvsignore', ('About.py',
+                ('.idlerc', '.pylint.d')))))))
         """
 
         left = self.__items[0]
@@ -157,10 +155,9 @@ class Cluster(object):
         receive and the higher you set it, you will receive less but bigger
         clusters.
 
-        PARAMETERS
-            threshold - The level threshold
+        :param threshold: The level threshold:
 
-        NOTE
+        .. note::
             It is debatable whether the value passed into this method should
             really be as strongly linked to the real cluster-levels as it is
             right now. The end-user will not know the range of this value

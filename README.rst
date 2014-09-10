@@ -9,12 +9,16 @@ between two of those objects. For simple datatypes, like integers, this can be
 as simple as a subtraction, but more complex calculations are possible. Right
 now, it is possible to generate the clusters using a hierarchical clustering
 and the popular K-Means algorithm. For the hierarchical algorithm there are
-different "linkage" (single, complete, average and uclus) methods available. I
-plan to implement other algoithms as well on an
-"as-needed" or "as-I-have-time" basis.
+different "linkage" (single, complete, average and uclus) methods available.
 
 Algorithms are based on the document found at
 http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/
+
+.. note::
+    The above site is no longer avaialble, but you can still view it in the
+    internet archive at:
+    https://web.archive.org/web/20070912040206/http://home.dei.polimi.it//matteucc/Clustering/tutorial_html/
+
 
 USAGE
 =====
@@ -33,10 +37,10 @@ Note, that when you retrieve a set of clusters, it immediately starts the
 clustering process, which is quite complex. If you intend to create clusters
 from a large dataset, consider doing that in a separate thread.
 
-For K-Means clustering it would look like this:
+For K-Means clustering it would look like this::
 
-     >>> from cluster import KMeansClustering
-     >>> cl = KMeansClustering([(1,1), (2,1), (5,3), ...])
-     >>> clusters = cl.getclusters(2)
+    >>> from cluster import KMeansClustering
+    >>> cl = KMeansClustering([(1,1), (2,1), (5,3), ...])
+    >>> clusters = cl.getclusters(2)
 
 The parameter passed to getclusters is the count of clusters generated.
