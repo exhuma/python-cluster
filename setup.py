@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-readme_contents = open("README").read()
+readme_contents = open("README.rst").read()
 
 # index where the first paragraph starts
 parastart = readme_contents.find('=\n') + 3
