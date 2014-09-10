@@ -1,6 +1,10 @@
 DESCRIPTION
 ===========
 
+.. image:: https://readthedocs.org/projects/python-cluster/badge/?version=latest
+    :target: https://readthedocs.org/projects/python-cluster/?badge=latest
+    :alt: Documentation Status
+
 python-cluster is a "simple" package that allows to create several groups
 (clusters) of objects from a list. It's meant to be flexible and able to
 cluster any object. To ensure this kind of flexibility, you need not only to
@@ -44,3 +48,8 @@ For K-Means clustering it would look like this::
     >>> clusters = cl.getclusters(2)
 
 The parameter passed to getclusters is the count of clusters generated.
+
+
+.. image:: https://readthedocs.org/projects/python-cluster/badge/?version=latest
+    :target: https://readthedocs.org/projects/python-cluster/?badge=latest
+    :alt: Documentation Status
