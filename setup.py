@@ -13,7 +13,7 @@ setup(
     version='1.2.0',
     author='Michel Albert',
     author_email='exhuma@users.sourceforge.net',
-    url='http://python-cluster.sourceforge.net/',
+    url='https://github.com/exhuma/python-cluster',
     packages=['cluster', 'cluster.method'],
     license='LGPL',
     description=readme_contents[parastart:sentence_end],
