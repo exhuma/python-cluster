@@ -3,14 +3,10 @@ Welcome to python-cluster's documentation!
 
 Implementation of cluster algorithms in pure Python.
 
-.. warning::
 
-    This is currently a bug in HierarchicalClustering which causes incorrect
-    output. This is currently being worked on. In the meantime
-    ``HierarchicalClustering`` should be regarded as *broken*!
 
-Example
--------
+Example for K-Means Clustering
+------------------------------
 
 ::
 
@@ -30,7 +26,7 @@ Example
         (9, 3)
     ]
     cl = KMeansClustering(data)
-    c.getclusters(2)
+    cl.getclusters(2)
 
 The above code would give the following result::
 
@@ -38,6 +34,44 @@ The above code would give the following result::
         [(8, 2), (8, 1), (8, 3), (7, 3), (9, 2), (9, 3)],
         [(3, 5), (1, 5), (3, 4), (2, 6), (2, 5), (3, 6)]
     ]
+
+
+Example for Hierarchical Clustering
+-----------------------------------
+
+::
+
+    from cluster import HierarchicalClustering
+    data = [791, 956, 676, 124, 564, 84, 24, 365, 594, 940, 398,
+            971, 131, 365, 542, 336, 518, 835, 134, 391]
+    cl = HierarchicalClustering(data)
+    cl.getlevel(40)
+
+The above code would give the following result::
+
+    [
+        [24],
+        [84, 124, 131, 134],
+        [336, 365, 365, 391, 398],
+        [676],
+        [594, 518, 542, 564],
+        [940, 956, 971],
+        [791],
+        [835],
+    ]
+
+
+Using :py:meth:`~cluster.method.hierarchical.HierarchicalClustering.getlevel()`
+returns clusters where the distance between each cluster is no less than
+*level*.
+
+.. note::
+
+    Due to a bug_ in earlier releases, the elements of the input data *must be*
+    sortable!
+
+    .. _bug: https://github.com/exhuma/python-cluster/issues/11
+
 
 API
 ---

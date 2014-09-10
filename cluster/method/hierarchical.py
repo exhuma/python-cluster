@@ -31,7 +31,7 @@ class HierarchicalClustering(BaseClusterMethod):
     Implementation of the hierarchical clustering method as explained in a
     tutorial_ by *matteucc*.
 
-    .. _tutorial:: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
+    .. _tutorial: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
 
     Example:
 
@@ -61,7 +61,7 @@ class HierarchicalClustering(BaseClusterMethod):
             linkage = 'single'
         logger.info("Initializing HierarchicalClustering object with linkage "
                     "method %s", linkage)
-        BaseClusterMethod.__init__(self, data, distance_function)
+        BaseClusterMethod.__init__(self, sorted(data), distance_function)
         self.set_linkage_method(linkage)
         self.num_processes = num_processes
         self.__cluster_created = False
