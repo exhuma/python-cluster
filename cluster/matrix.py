@@ -58,10 +58,8 @@ class Matrix(object):
         for task in iter(self.task_queue.get, 'STOP'):
             col_index, item, item2 = task
             result = (col_index, self.combinfunc(item, item2))
-            self.task_queue.task_done()
             self.done_queue.put(result)
             tasks_completed += 1
-        self.task_queue.task_done()
         logger.info("Worker %s performed %s tasks",
                     current_process().name,
                     tasks_completed)
@@ -117,7 +115,6 @@ class Matrix(object):
                     # blocking operation)
                     if num_tasks_queued > num_processes:
                         col_index, result = self.done_queue.get()
-                        self.done_queue.task_done()
                         row[col_index] = result
                         num_tasks_completed += 1
                 else:
@@ -136,7 +133,6 @@ class Matrix(object):
                 # Grab the remaining worker task results
                 while num_tasks_completed < num_tasks_queued:
                     col_index, result = self.done_queue.get()
-                    self.done_queue.task_done()
                     row[col_index] = result
                     num_tasks_completed += 1
 
