@@ -164,6 +164,13 @@ class HClusterIntegerTestCase(unittest.TestCase):
         [new_data.extend(_) for _ in cl.getlevel(40)]
         self.assertEqual(sorted(new_data), sorted(self.__data))
 
+    def testMultiprocessing(self):
+        cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y),
+                                    num_processes=4)
+        new_data = []
+        [new_data.extend(_) for _ in cl.getlevel(40)]
+        self.assertEqual(sorted(new_data), sorted(self.__data))
+
 
 class HClusterStringTestCase(unittest.TestCase):
 
