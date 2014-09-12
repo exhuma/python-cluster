@@ -117,6 +117,25 @@ class HClusterIntegerTestCase(unittest.TestCase):
         ]
         self.assertEqual(result, expected)
 
+    def testUCLUS(self):
+        "Basic Hierarchical Clustering test with integers"
+        cl = HierarchicalClustering(self.__data,
+                                    lambda x, y: abs(x - y),
+                                    linkage='uclus')
+        expected = [
+            [24],
+            [84],
+            [124, 131, 134],
+            [336, 365, 365, 391, 398],
+            [518, 542, 564],
+            [594],
+            [676],
+            [791],
+            [835],
+            [940, 956, 971],
+        ]
+        result = sorted([sorted(_) for _ in cl.getlevel(40)])
+        self.assertEqual(result, expected)
 
     def testUnmodifiedData(self):
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
