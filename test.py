@@ -73,23 +73,100 @@ class HClusterIntegerTestCase(unittest.TestCase):
         self.__data = [791, 956, 676, 124, 564, 84, 24, 365, 594, 940, 398,
                        971, 131, 365, 542, 336, 518, 835, 134, 391]
 
-    def testCluster(self):
+    def testSingleLinkage(self):
         "Basic Hierarchical Clustering test with integers"
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
-        cl.cluster()
+        result = cl.getlevel(40)
+
+        # sort the values to make the tests less prone to algorithm changes
+        result = sorted([sorted(_) for _ in result])
         self.assertEqual([
             [24],
             [84, 124, 131, 134],
             [336, 365, 365, 391, 398],
+            [518, 542, 564, 594],
             [676],
-            [594, 518, 542, 564],
-            [940, 956, 971],
             [791],
             [835],
-        ], cl.getlevel(40))
+            [940, 956, 971],
+        ], result)
+
+    def testCompleteLinkage(self):
+        "Basic Hierarchical Clustering test with integers"
+        cl = HierarchicalClustering(self.__data,
+                                    lambda x, y: abs(x - y),
+                                    linkage='complete')
+        result = cl.getlevel(40)
+
+        # sort the values to make the tests less prone to algorithm changes
+        result = sorted([sorted(_) for _ in result])
+
+        expected = [
+            [24],
+            [84],
+            [124, 131, 134],
+            [336, 365, 365],
+            [391, 398],
+            [518],
+            [542, 564],
+            [594],
+            [676],
+            [791],
+            [835],
+            [940, 956, 971],
+        ]
+        self.assertEqual(result, expected)
+
+    def testUCLUS(self):
+        "Basic Hierarchical Clustering test with integers"
+        cl = HierarchicalClustering(self.__data,
+                                    lambda x, y: abs(x - y),
+                                    linkage='uclus')
+        expected = [
+            [24],
+            [84],
+            [124, 131, 134],
+            [336, 365, 365, 391, 398],
+            [518, 542, 564],
+            [594],
+            [676],
+            [791],
+            [835],
+            [940, 956, 971],
+        ]
+        result = sorted([sorted(_) for _ in cl.getlevel(40)])
+        self.assertEqual(result, expected)
+
+    def testAverageLinkage(self):
+        cl = HierarchicalClustering(self.__data,
+                                    lambda x, y: abs(x - y),
+                                    linkage='average')
+        # TODO: The current test-data does not really trigger a difference
+        # between UCLUS and "average" linkage.
+        expected = [
+            [24],
+            [84],
+            [124, 131, 134],
+            [336, 365, 365, 391, 398],
+            [518, 542, 564],
+            [594],
+            [676],
+            [791],
+            [835],
+            [940, 956, 971],
+        ]
+        result = sorted([sorted(_) for _ in cl.getlevel(40)])
+        self.assertEqual(result, expected)
 
     def testUnmodifiedData(self):
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
+        new_data = []
+        [new_data.extend(_) for _ in cl.getlevel(40)]
+        self.assertEqual(sorted(new_data), sorted(self.__data))
+
+    def testMultiprocessing(self):
+        cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y),
+                                    num_processes=4)
         new_data = []
         [new_data.extend(_) for _ in cl.getlevel(40)]
         self.assertEqual(sorted(new_data), sorted(self.__data))
