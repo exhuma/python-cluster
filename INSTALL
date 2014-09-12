@@ -18,7 +18,7 @@ Untar the archive::
    tar xf <filename.tar.gz>
 
 Next, go to the folder just created. It will have the same name as the package
-(for example "cluster-1.2.0") and run::
+(for example "cluster-1.2.1") and run::
 
     python setup.py install
 
