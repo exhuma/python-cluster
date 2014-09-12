@@ -12,9 +12,23 @@ setup(
     name='cluster',
     version='1.2.1',
     author='Michel Albert',
-    author_email='exhuma@users.sourceforge.net',
+    author_email='michel@albert.lu',
     url='https://github.com/exhuma/python-cluster',
     packages=['cluster', 'cluster.method'],
     license='LGPL',
     description=readme_contents[parastart:sentence_end],
-    long_description=readme_contents)
+    long_description=readme_contents,
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Other Audience',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+    ]
+)
