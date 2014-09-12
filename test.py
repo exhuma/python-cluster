@@ -76,17 +76,20 @@ class HClusterIntegerTestCase(unittest.TestCase):
     def testSingleLinkage(self):
         "Basic Hierarchical Clustering test with integers"
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
-        cl.cluster()
+        result = cl.getlevel(40)
+
+        # sort the values to make the tests less prone to algorithm changes
+        result = sorted([sorted(_) for _ in result])
         self.assertEqual([
             [24],
             [84, 124, 131, 134],
             [336, 365, 365, 391, 398],
+            [518, 542, 564, 594],
             [676],
-            [594, 518, 542, 564],
-            [940, 956, 971],
             [791],
             [835],
-        ], cl.getlevel(40))
+            [940, 956, 971],
+        ], result)
 
     def testCompleteLinkage(self):
         "Basic Hierarchical Clustering test with integers"
