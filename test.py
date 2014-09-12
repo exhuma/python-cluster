@@ -73,7 +73,7 @@ class HClusterIntegerTestCase(unittest.TestCase):
         self.__data = [791, 956, 676, 124, 564, 84, 24, 365, 594, 940, 398,
                        971, 131, 365, 542, 336, 518, 835, 134, 391]
 
-    def testCluster(self):
+    def testSingleLinkage(self):
         "Basic Hierarchical Clustering test with integers"
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
         cl.cluster()
@@ -87,6 +87,33 @@ class HClusterIntegerTestCase(unittest.TestCase):
             [791],
             [835],
         ], cl.getlevel(40))
+
+    def testCompleteLinkage(self):
+        "Basic Hierarchical Clustering test with integers"
+        cl = HierarchicalClustering(self.__data,
+                                    lambda x, y: abs(x - y),
+                                    linkage='complete')
+        result = cl.getlevel(40)
+
+        # sort the values to make the tests less prone to algorithm changes
+        result = sorted([sorted(_) for _ in result])
+
+        expected = [
+            [24],
+            [84],
+            [124, 131, 134],
+            [336, 365, 365],
+            [391, 398],
+            [518],
+            [542, 564],
+            [594],
+            [676],
+            [791],
+            [835],
+            [940, 956, 971],
+        ]
+        self.assertEqual(result, expected)
+
 
     def testUnmodifiedData(self):
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
