@@ -137,6 +137,27 @@ class HClusterIntegerTestCase(unittest.TestCase):
         result = sorted([sorted(_) for _ in cl.getlevel(40)])
         self.assertEqual(result, expected)
 
+    def testAverageLinkage(self):
+        cl = HierarchicalClustering(self.__data,
+                                    lambda x, y: abs(x - y),
+                                    linkage='average')
+        # TODO: The current test-data does not really trigger a difference
+        # between UCLUS and "average" linkage.
+        expected = [
+            [24],
+            [84],
+            [124, 131, 134],
+            [336, 365, 365, 391, 398],
+            [518, 542, 564],
+            [594],
+            [676],
+            [791],
+            [835],
+            [940, 956, 971],
+        ]
+        result = sorted([sorted(_) for _ in cl.getlevel(40)])
+        self.assertEqual(result, expected)
+
     def testUnmodifiedData(self):
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y))
         new_data = []
