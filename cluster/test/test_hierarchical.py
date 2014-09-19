@@ -53,7 +53,7 @@ class HClusterSmallListTestCase(Py23TestCase):
         length 1
         """
         cl = HierarchicalClustering([876], lambda x, y: abs(x - y))
-        self.assertCItemsEqual([876], cl.getlevel(40))
+        self.assertEqual([[876]], cl.getlevel(40))
 
     def testClusterLen0(self):
         """
@@ -75,17 +75,19 @@ class HClusterIntegerTestCase(Py23TestCase):
         result = cl.getlevel(40)
 
         # sort the values to make the tests less prone to algorithm changes
-        result = [sorted(_) for _ in result]
-        self.assertCItemsEqual([
-            [24],
-            [336, 365, 365, 391, 398],
-            [518, 542, 564, 594],
-            [676],
+        result = sorted([sorted(_) for _ in result])
+        expected = sorted([
             [791],
+            [676],
+            [84],
+            [24],
             [835],
-            [84, 124, 131, 134],
-            [940, 956, 971],
-        ], result)
+            sorted([134, 131, 124]),
+            sorted([971, 956, 940]),
+            sorted([391, 398, 365, 365, 336]),
+            sorted([542, 564, 518, 594])
+        ])
+        self.assertEqual(expected, result)
 
     def testCompleteLinkage(self):
         "Basic Hierarchical Clustering test with integers"
@@ -97,20 +99,21 @@ class HClusterIntegerTestCase(Py23TestCase):
         # sort the values to make the tests less prone to algorithm changes
         result = sorted([sorted(_) for _ in result])
 
-        expected = [
-            [24],
-            [84],
-            [124, 131, 134],
-            [336, 365, 365],
-            [391, 398],
-            [518],
-            [542, 564],
-            [594],
-            [676],
+        expected = sorted([
             [791],
+            [676],
+            [84],
+            [24],
+            [594],
+            [940],
+            [518],
             [835],
-            [940, 956, 971],
-        ]
+            sorted([391, 398]),
+            sorted([134, 131, 124]),
+            sorted([971, 956]),
+            sorted([542, 564]),
+            sorted([365, 365, 336])
+        ])
         self.assertEqual(result, expected)
 
     def testUCLUS(self):
@@ -118,18 +121,19 @@ class HClusterIntegerTestCase(Py23TestCase):
         cl = HierarchicalClustering(self.__data,
                                     lambda x, y: abs(x - y),
                                     linkage='uclus')
-        expected = [
-            [24],
-            [84],
-            [124, 131, 134],
-            [336, 365, 365, 391, 398],
-            [518, 542, 564],
-            [594],
-            [676],
+        expected = sorted([
             [791],
+            [676],
+            [84],
+            [24],
+            [594],
+            [518],
             [835],
-            [940, 956, 971],
-        ]
+            sorted([134, 131, 124]),
+            sorted([542, 564]),
+            sorted([971, 956, 940]),
+            sorted([365, 365, 336, 391, 398])
+        ])
         result = sorted([sorted(_) for _ in cl.getlevel(40)])
         self.assertEqual(result, expected)
 
@@ -137,20 +141,19 @@ class HClusterIntegerTestCase(Py23TestCase):
         cl = HierarchicalClustering(self.__data,
                                     lambda x, y: abs(x - y),
                                     linkage='average')
-        # TODO: The current test-data does not really trigger a difference
-        # between UCLUS and "average" linkage.
-        expected = [
-            [24],
-            [84],
-            [124, 131, 134],
-            [336, 365, 365, 391, 398],
-            [518, 542, 564],
-            [594],
-            [676],
+        expected = sorted([
             [791],
+            [676],
+            [84],
+            [24],
+            [594],
             [835],
-            [940, 956, 971],
-        ]
+            sorted([391, 398]),
+            sorted([134, 131, 124]),
+            sorted([971, 956, 940]),
+            sorted([365, 365, 336]),
+            sorted([542, 564, 518])
+        ])
         result = sorted([sorted(_) for _ in cl.getlevel(40)])
         self.assertEqual(result, expected)
 
@@ -188,22 +191,33 @@ class HClusterStringTestCase(Py23TestCase):
                 "Every item should be a list!")
 
     def testCluster(self):
-        "Basic Hierachical clustering test with strings"
-        self.skipTest('These values lead to non-deterministic results. '
-                      'This makes it untestable!')
-        cl = HierarchicalClustering(self.__data, self.sim)
-        self.assertEqual([
-            ['ultricies'],
-            ['Sed'],
-            ['Phasellus'],
-            ['mi'],
-            ['Nullam'],
-            ['sit', 'elit', 'elit', 'Ut', 'amet', 'at'],
-            ['leo', 'Lorem', 'dolor'],
-            ['congue', 'neque', 'consectetuer', 'consequat'],
-            ['adipiscing'],
+        """
+        Using the threshold value 0.5 with single distance puts us into a
+        situation where the algorithm might stop too soon as there are a few
+        consecutive steps towards a cluster with a level higher than 0.5!
+
+        This test ensures that it runs as far as required.
+        """
+        # XXX self.skipTest('These values lead to non-deterministic results. '
+        # XXX               'This makes it untestable!')
+        cl = HierarchicalClustering(self.__data, self.sim, linkage="single")
+
+        result = sorted([sorted(_) for _ in cl.getlevel(0.5)])
+        expected = sorted([
+            ['Lorem'],
             ['ipsum'],
-        ], cl.getlevel(0.5))
+            ['adipiscing'],
+            ['Phasellus'],
+            ['ultricies'],
+            ['mi'],
+            ['Sed'],
+            ['Nullam'],
+            sorted(['elit', 'elit', 'sit']),
+            sorted(['consequat', 'consectetuer', 'neque', 'congue']),
+            sorted(['leo', 'dolor']),
+            sorted(['at', 'amet', 'Ut']),
+        ])
+        self.assertEqual(result, expected)
 
     def testUnmodifiedData(self):
         cl = HierarchicalClustering(self.__data, self.sim)

@@ -19,7 +19,6 @@ from functools import partial
 import logging
 
 from cluster.cluster import Cluster
-from cluster.matrix import Matrix
 from cluster.method.base import BaseClusterMethod
 from cluster.linkage import single, complete, average, uclus
 
@@ -103,106 +102,62 @@ class HierarchicalClustering(BaseClusterMethod):
             distance value between both collections.
         """
         if method == 'single':
-            self.linkage = single
+            self.linkage = min
         elif method == 'complete':
-            self.linkage = complete
+            self.linkage = max
         elif method == 'average':
-            self.linkage = average
+            self.linkage = mean
         elif method == 'uclus':
-            self.linkage = uclus
+            self.linkage = median
         elif hasattr(method, '__call__'):
             self.linkage = method
         else:
             raise ValueError('distance method must be one of single, '
                              'complete, average of uclus')
 
-    def cluster(self, matrix=None, level=None, sequence=None):
-        """
-        Perform hierarchical clustering.
+    def __similarity(self, simfunc, a, b):
+        return self.linkage([simfunc(x, y) for x in a for y in b])
 
-        :param matrix: The 2D list that is currently under processing. The
-            matrix contains the distances of each item with each other
-        :param level: The current level of clustering
-        :param sequence: The sequence number of the clustering
-        """
-        logger.info("Performing cluster()")
+    def __reconstruct(self, cluster_indices):
+        if not cluster_indices:
+            return []
+        return [[self._input[i] for i in _] for _ in cluster_indices]
 
-        if matrix is None:
-            # create level 0, first iteration (sequence)
-            level = 0
-            sequence = 0
-            matrix = []
+    def run(self, threshold):
+        indices = [[_] for _ in range(len(self._input))]
+        lookbehind = None
+        minimum = 0
+        while len(indices) > 1:
+            minimum = None
+            min_pair = None
+            permutations = ((a, b)
+                            for i, a in enumerate(indices)
+                            for b in indices[:i])
+            for x, y in permutations:
+                sim = self.__similarity(
+                    self.distance,
+                    [self._input[_] for _ in x],
+                    [self._input[_] for _ in y])
+                if minimum is None or sim < minimum:
+                    minimum = sim
+                    min_pair = (x, y)
+                if minimum == 0:
+                    break
+            if minimum > threshold:
+                # we've come too far. Undo the last operation
+                if lookbehind:
+                    indices.pop()
+                    indices.extend(lookbehind)
+                return indices, minimum
+            lookbehind = min_pair
+            indices.append(min_pair[0] + min_pair[1])
+            indices.remove(min_pair[0])
+            indices.remove(min_pair[1])
+        return indices, minimum
 
-        # if the matrix only has two rows left, we are done
-        linkage = partial(self.linkage, distance_function=self.distance)
-        initial_element_count = len(self._data)
-        while len(matrix) > 2 or matrix == []:
-
-            item_item_matrix = Matrix(self._data,
-                                      linkage,
-                                      True,
-                                      0)
-            item_item_matrix.genmatrix(self.num_processes)
-            matrix = item_item_matrix.matrix
-
-            smallestpair = None
-            mindistance = None
-            rowindex = 0  # keep track of where we are in the matrix
-            # find the minimum distance
-            for row in matrix:
-                cellindex = 0  # keep track of where we are in the matrix
-                for cell in row:
-                    # if we are not on the diagonal (which is always 0)
-                    # and if this cell represents a new minimum...
-                    cell_lt_mdist = cell < mindistance if mindistance else False
-                    if ((rowindex != cellindex) and
-                            (cell_lt_mdist or smallestpair is None)):
-                        smallestpair = (rowindex, cellindex)
-                        mindistance = cell
-                    cellindex += 1
-                rowindex += 1
-
-            sequence += 1
-            level = matrix[smallestpair[1]][smallestpair[0]]
-            cluster = Cluster(level, self._data[smallestpair[0]],
-                              self._data[smallestpair[1]])
-
-            # maintain the data, by combining the the two most similar items
-            # in the list we use the min and max functions to ensure the
-            # integrity of the data.  imagine: if we first remove the item
-            # with the smaller index, all the rest of the items shift down by
-            # one. So the next index will be wrong. We could simply adjust the
-            # value of the second "remove" call, but we don't know the order
-            # in which they come. The max and min approach clarifies that
-            self._data.remove(self._data[max(smallestpair[0],
-                                             smallestpair[1])])  # remove item 1
-            self._data.remove(self._data[min(smallestpair[0],
-                                             smallestpair[1])])  # remove item 2
-            self._data.append(cluster)  # append item 1 and 2 combined
-
-            self.publish_progress(initial_element_count, len(self._data))
-
-        # all the data is in one single cluster. We return that and stop
-        self.__cluster_created = True
-        logger.info("Call to cluster() is complete")
-        return
+    def cluster(self):
+        pass
 
     def getlevel(self, threshold):
-        """
-        Returns all clusters with a maximum distance of *threshold* in between
-        each other
-
-        :param threshold: the maximum distance between clusters.
-
-        See :py:meth:`~cluster.cluster.Cluster.getlevel`
-        """
-
-        # if it's not worth clustering, just return the data
-        if len(self._input) <= 1:
-            return self._input
-
-        # initialize the cluster if not yet done
-        if not self.__cluster_created:
-            self.cluster()
-
-        return self._data[0].getlevel(threshold)
+        cluster, level = self.run(threshold)
+        return self.__reconstruct(cluster)
