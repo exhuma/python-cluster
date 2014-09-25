@@ -1,2 +1,2 @@
-include README LICENSE CHANGELOG
-include *.py cluster.bmp MANIFEST.in
+include README.rst LICENSE CHANGELOG
+include *.py cluster.bmp
