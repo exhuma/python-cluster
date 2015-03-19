@@ -15,8 +15,19 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-import unittest
+"""
+Tests for hierarchical clustering.
+
+.. note::
+
+    Even though the results are lists, the order of items in the resulting
+    clusters is non-deterministic. This should be taken into consideration when
+    writing "expected" values!
+"""
+
 from difflib import SequenceMatcher
+from sys import hexversion
+import unittest
 
 from cluster import HierarchicalClustering
 
@@ -26,13 +37,20 @@ class HClusterSmallListTestCase(unittest.TestCase):
     Test for Bug #1516204
     """
 
+    def __init__(self, *args, **kwargs):
+        super(HClusterSmallListTestCase, self).__init__(*args, **kwargs)
+        if hexversion < 0x030000f0:
+            self.assertCItemsEqual = self.assertItemsEqual
+        else:
+            self.assertCItemsEqual = self.assertCountEqual
+
     def testClusterLen1(self):
         """
         Testing if hierarchical clustering a set of length 1 returns a set of
         length 1
         """
         cl = HierarchicalClustering([876], lambda x, y: abs(x - y))
-        self.assertEqual([876], cl.getlevel(40))
+        self.assertCItemsEqual([876], cl.getlevel(40))
 
     def testClusterLen0(self):
         """
@@ -44,6 +62,13 @@ class HClusterSmallListTestCase(unittest.TestCase):
 
 class HClusterIntegerTestCase(unittest.TestCase):
 
+    def __init__(self, *args, **kwargs):
+        super(HClusterIntegerTestCase, self).__init__(*args, **kwargs)
+        if hexversion < 0x030000f0:
+            self.assertCItemsEqual = self.assertItemsEqual
+        else:
+            self.assertCItemsEqual = self.assertCountEqual
+
     def setUp(self):
         self.__data = [791, 956, 676, 124, 564, 84, 24, 365, 594, 940, 398,
                        971, 131, 365, 542, 336, 518, 835, 134, 391]
@@ -54,15 +79,15 @@ class HClusterIntegerTestCase(unittest.TestCase):
         result = cl.getlevel(40)
 
         # sort the values to make the tests less prone to algorithm changes
-        result = sorted([sorted(_) for _ in result])
-        self.assertEqual([
+        result = [sorted(_) for _ in result]
+        self.assertCItemsEqual([
             [24],
-            [84, 124, 131, 134],
             [336, 365, 365, 391, 398],
             [518, 542, 564, 594],
             [676],
             [791],
             [835],
+            [84, 124, 131, 134],
             [940, 956, 971],
         ], result)
 
