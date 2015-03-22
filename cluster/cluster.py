@@ -17,6 +17,8 @@
 
 from __future__ import print_function
 
+from .util import fullyflatten
+
 
 class Cluster(object):
     """
@@ -27,7 +29,7 @@ class Cluster(object):
     """
 
     def __repr__(self):
-        return "<Cluster@%s(%s)>" % (self.__level, self.__items)
+        return "<Cluster@%s(%s)>" % (self.level, self.items)
 
     def __str__(self):
         return self.__str__()
@@ -44,67 +46,18 @@ class Cluster(object):
             will get added as item to the cluster. You could also pass a list as
             second parameter to initialise the cluster with that list as content
         """
-        self.__level = level
+        self.level = level
         if len(args) == 0:
-            self.__items = []
+            self.items = []
         else:
-            self.__items = list(args)
-
-    def append(self, item):
-        """
-        Appends a new item to the cluster
-
-        :param item: The item that is to be appended.
-        """
-        self.__items.append(item)
-
-    def items(self, new_items=None):
-        """
-        Sets or gets the items of the cluster
-
-        :param new_items: if set, the items of the cluster will be replaced with
-            that argument.
-        """
-        if new_items is None:
-            return self.__items
-        else:
-            self.__items = new_items
-
-    def fullyflatten(self, *args):
-        """
-        Completely flattens out this cluster and returns a one-dimensional
-        list containing the cluster's items. This is useful in cases where
-        some items of the cluster are clusters in their own right and you only
-        want the items.
-
-        :param *args: only used for recursion.
-        """
-        flattened_items = []
-        if len(args) == 0:
-            collection = self.__items
-        else:
-            collection = args[0].items()
-
-        for item in collection:
-            if isinstance(item, Cluster):
-                flattened_items = flattened_items + self.fullyflatten(item)
-            else:
-                flattened_items.append(item)
-
-        return flattened_items
-
-    def level(self):
-        """
-        Returns the level associated with this cluster.
-        """
-        return self.__level
+            self.items = args
 
     def display(self, depth=0):
         """
         Pretty-prints this cluster. Useful for debuging.
         """
-        print(depth * "    " + "[level %s]" % self.__level)
-        for item in self.__items:
+        print(depth * "    " + "[level %s]" % self.level)
+        for item in self.items:
             if isinstance(item, Cluster):
                 item.display(depth + 1)
             else:
@@ -132,8 +85,8 @@ class Cluster(object):
                 ('.idlerc', '.pylint.d')))))))
         """
 
-        left = self.__items[0]
-        right = self.__items[1]
+        left = self.items[0]
+        right = self.items[1]
 
         if isinstance(left, Cluster):
             first = left.topology()
@@ -166,27 +119,27 @@ class Cluster(object):
             useful approach.
         """
 
-        left = self.__items[0]
-        right = self.__items[1]
+        left = self.items[0]
+        right = self.items[1]
 
         # if this object itself is below the threshold value we only need to
         # return it's contents as a list
-        if self.level() <= threshold:
-            return [self.fullyflatten()]
+        if self.level <= threshold:
+            return [fullyflatten(self.items)]
 
         # if this cluster's level is higher than the threshold we will
         # investgate it's left and right part. Their level could be below the
         # threshold
-        if isinstance(left, Cluster) and left.level() <= threshold:
+        if isinstance(left, Cluster) and left.level <= threshold:
             if isinstance(right, Cluster):
-                return [left.fullyflatten()] + right.getlevel(threshold)
+                return [fullyflatten(left.items)] + right.getlevel(threshold)
             else:
-                return [left.fullyflatten()] + [[right]]
-        elif isinstance(right, Cluster) and right.level() <= threshold:
+                return [fullyflatten(left.items)] + [[right]]
+        elif isinstance(right, Cluster) and right.level <= threshold:
             if isinstance(left, Cluster):
-                return left.getlevel(threshold) + [right.fullyflatten()]
+                return left.getlevel(threshold) + [fullyflatten(right.items)]
             else:
-                return [[left]] + [right.fullyflatten()]
+                return [[left]] + [fullyflatten(right.items)]
 
         # Alright. We covered the cases where one of the clusters was below
         # the threshold value. Now we'll deal with the clusters that are above

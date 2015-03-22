@@ -44,6 +44,25 @@ def flatten(L):
     return flatten(L[0]) + flatten(L[1:])
 
 
+def fullyflatten(container):
+    """
+    Completely flattens out a cluster and returns a one-dimensional set
+    containing the cluster's items. This is useful in cases where some items of
+    the cluster are clusters in their own right and you only want the items.
+
+    :param container: the container to flatten.
+    """
+    flattened_items = []
+
+    for item in container:
+        if hasattr(item, 'items'):
+            flattened_items = flattened_items + fullyflatten(item.items)
+        else:
+            flattened_items.append(item)
+
+    return flattened_items
+
+
 def median(numbers):
     """
     Return the median of the list of numbers.

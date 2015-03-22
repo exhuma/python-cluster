@@ -20,7 +20,7 @@ import logging
 from cluster.cluster import Cluster
 from cluster.matrix import Matrix
 from cluster.method.base import BaseClusterMethod
-from cluster.util import median, mean
+from cluster.util import median, mean, fullyflatten
 
 
 logger = logging.getLogger(__name__)
@@ -98,13 +98,13 @@ class HierarchicalClustering(BaseClusterMethod):
         if not isinstance(x, Cluster):
             x = [x]
         else:
-            x = x.fullyflatten()
+            x = fullyflatten(x.items)
 
         # create a flat list of all the items in <y>
         if not isinstance(y, Cluster):
             y = [y]
         else:
-            y = y.fullyflatten()
+            y = fullyflatten(y.items)
 
         distances = []
         for k in x:
@@ -125,13 +125,13 @@ class HierarchicalClustering(BaseClusterMethod):
         if not isinstance(x, Cluster):
             x = [x]
         else:
-            x = x.fullyflatten()
+            x = fullyflatten(x.items)
 
         # create a flat list of all the items in <y>
         if not isinstance(y, Cluster):
             y = [y]
         else:
-            y = y.fullyflatten()
+            y = fullyflatten(y.items)
 
         distances = []
         for k in x:
@@ -153,13 +153,13 @@ class HierarchicalClustering(BaseClusterMethod):
         if not isinstance(x, Cluster):
             x = [x]
         else:
-            x = x.fullyflatten()
+            x = fullyflatten(x.items)
 
         # create a flat list of all the items in <y>
         if not isinstance(y, Cluster):
             y = [y]
         else:
-            y = y.fullyflatten()
+            y = fullyflatten(y.items)
 
         # retrieve the minimum distance (single-linkage)
         maxdist = self.distance(x[0], y[0])
@@ -183,13 +183,13 @@ class HierarchicalClustering(BaseClusterMethod):
         if not isinstance(x, Cluster):
             x = [x]
         else:
-            x = x.fullyflatten()
+            x = fullyflatten(x.items)
 
         # create a flat list of all the items in <y>
         if not isinstance(y, Cluster):
             y = [y]
         else:
-            y = y.fullyflatten()
+            y = fullyflatten(y.items)
 
         # retrieve the minimum distance (single-linkage)
         mindist = self.distance(x[0], y[0])
