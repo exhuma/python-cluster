@@ -52,6 +52,14 @@ class Cluster(object):
         else:
             self.items = args
 
+    def __iter__(self):
+        for item in self.items:
+            if isinstance(item, Cluster):
+                for recursed_item in item:
+                    yield recursed_item
+            else:
+                yield item
+
     def display(self, depth=0):
         """
         Pretty-prints this cluster. Useful for debuging.

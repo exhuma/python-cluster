@@ -57,6 +57,10 @@ class Matrix(object):
         tasks_completed = 0
         for task in iter(self.task_queue.get, 'STOP'):
             col_index, item, item2 = task
+            if not hasattr(item, '__iter__'):
+                item = [item]
+            if not hasattr(item2, '__iter__'):
+                item2 = [item2]
             result = (col_index, self.combinfunc(item, item2))
             self.done_queue.put(result)
             tasks_completed += 1
@@ -119,6 +123,10 @@ class Matrix(object):
                         num_tasks_completed += 1
                 else:
                     # Otherwise do it here, in line
+                    if not hasattr(item, '__iter__'):
+                        item = [item]
+                    if not hasattr(item2, '__iter__'):
+                        item2 = [item2]
                     row[col_index] = self.combinfunc(item, item2)
 
             if self.symmetric:
