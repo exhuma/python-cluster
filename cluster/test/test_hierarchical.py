@@ -32,17 +32,20 @@ import unittest
 from cluster import HierarchicalClustering
 
 
-class HClusterSmallListTestCase(unittest.TestCase):
-    """
-    Test for Bug #1516204
-    """
+class Py23TestCase(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(HClusterSmallListTestCase, self).__init__(*args, **kwargs)
+        super(Py23TestCase, self).__init__(*args, **kwargs)
         if hexversion < 0x030000f0:
             self.assertCItemsEqual = self.assertItemsEqual
         else:
             self.assertCItemsEqual = self.assertCountEqual
+
+
+class HClusterSmallListTestCase(Py23TestCase):
+    """
+    Test for Bug #1516204
+    """
 
     def testClusterLen1(self):
         """
@@ -60,7 +63,7 @@ class HClusterSmallListTestCase(unittest.TestCase):
         self.assertEqual([], cl.getlevel(40))
 
 
-class HClusterIntegerTestCase(unittest.TestCase):
+class HClusterIntegerTestCase(Py23TestCase):
 
     def __init__(self, *args, **kwargs):
         super(HClusterIntegerTestCase, self).__init__(*args, **kwargs)
@@ -172,7 +175,7 @@ class HClusterIntegerTestCase(unittest.TestCase):
         self.assertEqual(sorted(new_data), sorted(self.__data))
 
 
-class HClusterStringTestCase(unittest.TestCase):
+class HClusterStringTestCase(Py23TestCase):
 
     def sim(self, x, y):
         sm = SequenceMatcher(lambda x: x in ". -", x, y)
@@ -212,3 +215,13 @@ class HClusterStringTestCase(unittest.TestCase):
         new_data = []
         [new_data.extend(_) for _ in cl.getlevel(0.5)]
         self.assertEqual(sorted(new_data), sorted(self.__data))
+
+
+if __name__ == '__main__':
+    suite = unittest.TestSuite((
+        unittest.makeSuite(HClusterIntegerTestCase),
+        unittest.makeSuite(HClusterSmallListTestCase),
+        unittest.makeSuite(HClusterStringTestCase),
+    ))
+
+    unittest.TextTestRunner(verbosity=2).run(suite)
