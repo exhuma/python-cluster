@@ -21,7 +21,6 @@ import logging
 from cluster.cluster import Cluster
 from cluster.matrix import Matrix
 from cluster.method.base import BaseClusterMethod
-from cluster.util import median, mean, fullyflatten
 from cluster.linkage import single, complete, average, uclus
 
 
