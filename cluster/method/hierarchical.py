@@ -15,12 +15,14 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+from functools import partial
 import logging
 
 from cluster.cluster import Cluster
 from cluster.matrix import Matrix
 from cluster.method.base import BaseClusterMethod
 from cluster.util import median, mean, fullyflatten
+from cluster.linkage import single, complete, average, uclus
 
 
 logger = logging.getLogger(__name__)
@@ -58,7 +60,7 @@ class HierarchicalClustering(BaseClusterMethod):
 
     def __init__(self, data, distance_function, linkage=None, num_processes=1):
         if not linkage:
-            linkage = 'single'
+            linkage = single
         logger.info("Initializing HierarchicalClustering object with linkage "
                     "method %s", linkage)
         BaseClusterMethod.__init__(self, sorted(data), distance_function)
@@ -74,130 +76,18 @@ class HierarchicalClustering(BaseClusterMethod):
             ``'single'``, ``'complete'``, ``'average'`` or ``'uclus'``.
         """
         if method == 'single':
-            self.linkage = self.single_linkage_distance
+            self.linkage = single
         elif method == 'complete':
-            self.linkage = self.complete_linkage_distance
+            self.linkage = complete
         elif method == 'average':
-            self.linkage = self.average_linkage_distance
+            self.linkage = average
         elif method == 'uclus':
-            self.linkage = self.uclus_distance
+            self.linkage = uclus
+        elif hasattr(method, '__call__'):
+            self.linkage = method
         else:
             raise ValueError('distance method must be one of single, '
                              'complete, average of uclus')
-
-    def uclus_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *average* (median) distance
-        from any member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = fullyflatten(x.items)
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = fullyflatten(y.items)
-
-        distances = []
-        for k in x:
-            for l in y:
-                distances.append(self.distance(k, l))
-        return median(distances)
-
-    def average_linkage_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *average* (mean) distance
-        from any member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = fullyflatten(x.items)
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = fullyflatten(y.items)
-
-        distances = []
-        for k in x:
-            for l in y:
-                distances.append(self.distance(k, l))
-        return mean(distances)
-
-    def complete_linkage_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *longest* distance from any
-        member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = fullyflatten(x.items)
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = fullyflatten(y.items)
-
-        # retrieve the minimum distance (single-linkage)
-        maxdist = self.distance(x[0], y[0])
-        for k in x:
-            for l in y:
-                maxdist = max(maxdist, self.distance(k, l))
-
-        return maxdist
-
-    def single_linkage_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *shortest* distance from any
-        member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = fullyflatten(x.items)
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = fullyflatten(y.items)
-
-        # retrieve the minimum distance (single-linkage)
-        mindist = self.distance(x[0], y[0])
-        for k in x:
-            for l in y:
-                mindist = min(mindist, self.distance(k, l))
-
-        return mindist
 
     def cluster(self, matrix=None, level=None, sequence=None):
         """
@@ -217,10 +107,11 @@ class HierarchicalClustering(BaseClusterMethod):
             matrix = []
 
         # if the matrix only has two rows left, we are done
+        linkage = partial(self.linkage, distance_function=self.distance)
         while len(matrix) > 2 or matrix == []:
 
             item_item_matrix = Matrix(self._data,
-                                      self.linkage,
+                                      linkage,
                                       True,
                                       0)
             item_item_matrix.genmatrix(self.num_processes)
