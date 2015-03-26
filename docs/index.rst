@@ -1,6 +1,18 @@
 Welcome to python-cluster's documentation!
 ==========================================
 
+Index
+-----
+
+.. toctree::
+   :maxdepth: 1
+
+   changelog
+
+
+Introduction
+------------
+
 Implementation of cluster algorithms in pure Python.
 
 As this is exacuted in the Python runtime, the code runs slower than similar
