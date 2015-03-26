@@ -10,7 +10,6 @@ def cached(fun):
     the way this is coded (interchangingly using sets and frozensets) is true
     for this specific case. For other cases that is not necessarily guaranteed.
     """
-    return fun
 
     _cache = {}
 
