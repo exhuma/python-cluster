@@ -16,6 +16,10 @@
 #
 
 
+from pkg_resources import resource_string
+
 from .method.hierarchical import HierarchicalClustering
 from .method.kmeans import KMeansClustering
 from .util import ClusteringError
+
+__version__ = resource_string('cluster', 'version.txt').decode('ascii').strip()
