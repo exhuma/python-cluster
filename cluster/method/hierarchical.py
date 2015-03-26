@@ -15,12 +15,13 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+from functools import partial
 import logging
 
 from cluster.cluster import Cluster
 from cluster.matrix import Matrix
 from cluster.method.base import BaseClusterMethod
-from cluster.util import median, mean
+from cluster.linkage import single, complete, average, uclus
 
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,12 @@ class HierarchicalClustering(BaseClusterMethod):
     Implementation of the hierarchical clustering method as explained in a
     tutorial_ by *matteucc*.
 
+    Object prerequisites:
+
+    * Items must be sortable (See `issue #11`_)
+    * Items must be hashable.
+
+    .. _issue #11: https://github.com/exhuma/python-cluster/issues/11
     .. _tutorial: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
 
     Example:
@@ -47,157 +54,67 @@ class HierarchicalClustering(BaseClusterMethod):
 
     See :py:class:`~cluster.method.base.BaseClusterMethod` for more details.
 
+    :param data: The collection of items to be clustered.
+    :param distance_function: A function which takes two elements of ``data``
+        and returns a distance between both elements.
     :param linkage: The method used to determine the distance between two
         clusters. See :py:meth:`~.HierarchicalClustering.set_linkage_method` for
-        the available methods.
+        possible values.
     :param num_processes: If you want to use multiprocessing to split up the
         work and run ``genmatrix()`` in parallel, specify num_processes > 1 and
         this number of workers will be spun up, the work split up amongst them
         evenly.
+    :param progress_callback: A function to be called on each iteration to
+        publish the progress. The function is called with two integer arguments
+        which represent the total number of elements in the cluster, and the
+        remaining elements to be clustered.
     """
 
-    def __init__(self, data, distance_function, linkage=None, num_processes=1):
+    def __init__(self, data, distance_function, linkage=None, num_processes=1,
+                 progress_callback=None):
         if not linkage:
-            linkage = 'single'
+            linkage = single
         logger.info("Initializing HierarchicalClustering object with linkage "
                     "method %s", linkage)
         BaseClusterMethod.__init__(self, sorted(data), distance_function)
         self.set_linkage_method(linkage)
         self.num_processes = num_processes
+        self.progress_callback = progress_callback
         self.__cluster_created = False
+
+    def publish_progress(self, total, current):
+        """
+        If a progress function was supplied, this will call that function with
+        the total number of elements, and the remaining number of elements.
+
+        :param total: The total number of elements.
+        :param remaining: The remaining number of elements.
+        """
+        if self.progress_callback:
+            self.progress_callback(total, current)
 
     def set_linkage_method(self, method):
         """
         Sets the method to determine the distance between two clusters.
 
-        :param method: The name of the method to use. It must be one of
-            ``'single'``, ``'complete'``, ``'average'`` or ``'uclus'``.
+        :param method: The method to use. It can be one of ``'single'``,
+            ``'complete'``, ``'average'`` or ``'uclus'``, or a callable. The
+            callable should take two collections as parameters and return a
+            distance value between both collections.
         """
         if method == 'single':
-            self.linkage = self.single_linkage_distance
+            self.linkage = single
         elif method == 'complete':
-            self.linkage = self.complete_linkage_distance
+            self.linkage = complete
         elif method == 'average':
-            self.linkage = self.average_linkage_distance
+            self.linkage = average
         elif method == 'uclus':
-            self.linkage = self.uclus_distance
+            self.linkage = uclus
+        elif hasattr(method, '__call__'):
+            self.linkage = method
         else:
             raise ValueError('distance method must be one of single, '
                              'complete, average of uclus')
-
-    def uclus_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *average* (median) distance
-        from any member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = x.fullyflatten()
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = y.fullyflatten()
-
-        distances = []
-        for k in x:
-            for l in y:
-                distances.append(self.distance(k, l))
-        return median(distances)
-
-    def average_linkage_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *average* (mean) distance
-        from any member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = x.fullyflatten()
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = y.fullyflatten()
-
-        distances = []
-        for k in x:
-            for l in y:
-                distances.append(self.distance(k, l))
-        return mean(distances)
-
-    def complete_linkage_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *longest* distance from any
-        member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = x.fullyflatten()
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = y.fullyflatten()
-
-        # retrieve the minimum distance (single-linkage)
-        maxdist = self.distance(x[0], y[0])
-        for k in x:
-            for l in y:
-                maxdist = max(maxdist, self.distance(k, l))
-
-        return maxdist
-
-    def single_linkage_distance(self, x, y):
-        """
-        The method to determine the distance between one cluster an another
-        item/cluster. The distance equals to the *shortest* distance from any
-        member of one cluster to any member of the other cluster.
-
-        :param x: first cluster/item.
-        :param y: second cluster/item.
-        """
-
-        # create a flat list of all the items in <x>
-        if not isinstance(x, Cluster):
-            x = [x]
-        else:
-            x = x.fullyflatten()
-
-        # create a flat list of all the items in <y>
-        if not isinstance(y, Cluster):
-            y = [y]
-        else:
-            y = y.fullyflatten()
-
-        # retrieve the minimum distance (single-linkage)
-        mindist = self.distance(x[0], y[0])
-        for k in x:
-            for l in y:
-                mindist = min(mindist, self.distance(k, l))
-
-        return mindist
 
     def cluster(self, matrix=None, level=None, sequence=None):
         """
@@ -217,10 +134,12 @@ class HierarchicalClustering(BaseClusterMethod):
             matrix = []
 
         # if the matrix only has two rows left, we are done
+        linkage = partial(self.linkage, distance_function=self.distance)
+        initial_element_count = len(self._data)
         while len(matrix) > 2 or matrix == []:
 
             item_item_matrix = Matrix(self._data,
-                                      self.linkage,
+                                      linkage,
                                       True,
                                       0)
             item_item_matrix.genmatrix(self.num_processes)
@@ -260,6 +179,8 @@ class HierarchicalClustering(BaseClusterMethod):
             self._data.remove(self._data[min(smallestpair[0],
                                              smallestpair[1])])  # remove item 2
             self._data.append(cluster)  # append item 1 and 2 combined
+
+            self.publish_progress(initial_element_count, len(self._data))
 
         # all the data is in one single cluster. We return that and stop
         self.__cluster_created = True
