@@ -3,6 +3,11 @@ Welcome to python-cluster's documentation!
 
 Implementation of cluster algorithms in pure Python.
 
+As this is exacuted in the Python runtime, the code runs slower than similar
+implementations in compiled languages. You gain however to run this on pretty
+much any Python object. The different clustering methods have different
+prerequisites however which are mentioned in the different implementations.
+
 
 
 Example for K-Means Clustering

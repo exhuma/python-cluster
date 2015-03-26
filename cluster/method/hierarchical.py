@@ -32,6 +32,12 @@ class HierarchicalClustering(BaseClusterMethod):
     Implementation of the hierarchical clustering method as explained in a
     tutorial_ by *matteucc*.
 
+    Object prerequisites:
+
+    * Items must be sortable (See `issue #11`_)
+    * Items must be hashable.
+
+    .. _issue #11: https://github.com/exhuma/python-cluster/issues/11
     .. _tutorial: http://www.elet.polimi.it/upload/matteucc/Clustering/tutorial_html/hierarchical.html
 
     Example:
@@ -48,13 +54,20 @@ class HierarchicalClustering(BaseClusterMethod):
 
     See :py:class:`~cluster.method.base.BaseClusterMethod` for more details.
 
+    :param data: The collection of items to be clustered.
+    :param distance_function: A function which takes two elements of ``data``
+        and returns a distance between both elements.
     :param linkage: The method used to determine the distance between two
         clusters. See :py:meth:`~.HierarchicalClustering.set_linkage_method` for
-        the available methods.
+        possible values.
     :param num_processes: If you want to use multiprocessing to split up the
         work and run ``genmatrix()`` in parallel, specify num_processes > 1 and
         this number of workers will be spun up, the work split up amongst them
         evenly.
+    :param progress_callback: A function to be called on each iteration to
+        publish the progress. The function is called with two integer arguments
+        which represent the total number of elements in the cluster, and the
+        remaining elements to be clustered.
     """
 
     def __init__(self, data, distance_function, linkage=None, num_processes=1,
@@ -70,6 +83,13 @@ class HierarchicalClustering(BaseClusterMethod):
         self.__cluster_created = False
 
     def publish_progress(self, total, current):
+        """
+        If a progress function was supplied, this will call that function with
+        the total number of elements, and the remaining number of elements.
+
+        :param total: The total number of elements.
+        :param remaining: The remaining number of elements.
+        """
         if self.progress_callback:
             self.progress_callback(total, current)
 
@@ -77,8 +97,10 @@ class HierarchicalClustering(BaseClusterMethod):
         """
         Sets the method to determine the distance between two clusters.
 
-        :param method: The name of the method to use. It must be one of
-            ``'single'``, ``'complete'``, ``'average'`` or ``'uclus'``.
+        :param method: The method to use. It can be one of ``'single'``,
+            ``'complete'``, ``'average'`` or ``'uclus'``, or a callable. The
+            callable should take two collections as parameters and return a
+            distance value between both collections.
         """
         if method == 'single':
             self.linkage = single
