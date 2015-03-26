@@ -39,11 +39,12 @@ class BaseClusterMethod(object):
         they are comparable, it's ok.
     """
 
-    def __init__(self, input, distance_function):
+    def __init__(self, input, distance_function, progress_callback=None):
         self.distance = distance_function
         self._input = input    # the original input
         self._data = input[:]  # clone the input so we can work with it
                                # without distroying the original data.
+        self.progress_callback = progress_callback
 
     def topo(self):
         """

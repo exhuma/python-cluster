@@ -57,7 +57,8 @@ class HierarchicalClustering(BaseClusterMethod):
         evenly.
     """
 
-    def __init__(self, data, distance_function, linkage=None, num_processes=1):
+    def __init__(self, data, distance_function, linkage=None, num_processes=1,
+                 progress_callback=None):
         if not linkage:
             linkage = single
         logger.info("Initializing HierarchicalClustering object with linkage "
@@ -65,7 +66,12 @@ class HierarchicalClustering(BaseClusterMethod):
         BaseClusterMethod.__init__(self, sorted(data), distance_function)
         self.set_linkage_method(linkage)
         self.num_processes = num_processes
+        self.progress_callback = progress_callback
         self.__cluster_created = False
+
+    def publish_progress(self, total, current):
+        if self.progress_callback:
+            self.progress_callback(total, current)
 
     def set_linkage_method(self, method):
         """
@@ -107,6 +113,7 @@ class HierarchicalClustering(BaseClusterMethod):
 
         # if the matrix only has two rows left, we are done
         linkage = partial(self.linkage, distance_function=self.distance)
+        initial_element_count = len(self._data)
         while len(matrix) > 2 or matrix == []:
 
             item_item_matrix = Matrix(self._data,
@@ -150,6 +157,8 @@ class HierarchicalClustering(BaseClusterMethod):
             self._data.remove(self._data[min(smallestpair[0],
                                              smallestpair[1])])  # remove item 2
             self._data.append(cluster)  # append item 1 and 2 combined
+
+            self.publish_progress(initial_element_count, len(self._data))
 
         # all the data is in one single cluster. We return that and stop
         self.__cluster_created = True
