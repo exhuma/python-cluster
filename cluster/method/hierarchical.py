@@ -15,12 +15,10 @@
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-from functools import partial
 import logging
 
-from cluster.cluster import Cluster
 from cluster.method.base import BaseClusterMethod
-from cluster.linkage import single, complete, average, uclus
+from cluster.util import median, mean
 
 
 logger = logging.getLogger(__name__)
@@ -72,7 +70,7 @@ class HierarchicalClustering(BaseClusterMethod):
     def __init__(self, data, distance_function, linkage=None, num_processes=1,
                  progress_callback=None):
         if not linkage:
-            linkage = single
+            linkage = min
         logger.info("Initializing HierarchicalClustering object with linkage "
                     "method %s", linkage)
         BaseClusterMethod.__init__(self, sorted(data), distance_function)
