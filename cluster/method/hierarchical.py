@@ -124,15 +124,26 @@ class HierarchicalClustering(BaseClusterMethod):
         return [[self._input[i] for i in _] for _ in cluster_indices]
 
     def run(self, threshold):
+        """
+        In order to avoid to modify the input data, this will first create a
+        matrix of indices from the original data. All modifications are done on
+        the new index-based collection. This avoids moving potentially
+        heavy-weight objects around in memory.
+        """
         indices = [[_] for _ in range(len(self._input))]
         lookbehind = None
         minimum = 0
         while len(indices) > 1:
             minimum = None
             min_pair = None
+
+            # generate all possible combinations of elements, leaving out the
+            # symmetric counterparts, assuming that dist(a, b) == dist(b, a)
             permutations = ((a, b)
                             for i, a in enumerate(indices)
                             for b in indices[:i])
+
+            # Calculate distance between each of those pairs
             for x, y in permutations:
                 sim = self.__similarity(
                     self.distance,
