@@ -28,7 +28,7 @@ def cached(fun):
 def single(a, b, distance_function):
     """
     Given two collections ``a`` and ``b``, this will return the distance of the
-    points which are closest togetger.  ``distance_function`` is used to
+    points which are closest together.  ``distance_function`` is used to
     determine the distance between two elements.
 
     Example::
