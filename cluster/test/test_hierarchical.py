@@ -26,6 +26,7 @@ Tests for hierarchical clustering.
 """
 
 from difflib import SequenceMatcher
+from math import sqrt
 from sys import hexversion
 import unittest
 
@@ -210,6 +211,25 @@ class HClusterStringTestCase(Py23TestCase):
         new_data = []
         [new_data.extend(_) for _ in cl.getlevel(0.5)]
         self.assertEqual(sorted(new_data), sorted(self.__data))
+
+
+class HClusterTuplesTestCase(Py23TestCase):
+    '''
+    Test case to cover the case where the data contains tuple-items
+
+    See Github issue #20
+    '''
+
+    def testSingleLinkage(self):
+        "Basic Hierarchical Clustering test with integers"
+
+        def euclidian_distance(a, b):
+            return sqrt(sum([pow(z[0] - z[1], 2) for z in zip(a, b)]))
+
+        self.__data = [(1, 1), (1, 2), (1, 3)]
+        cl = HierarchicalClustering(self.__data, euclidian_distance)
+        result = cl.getlevel(40)
+        self.assertIsNotNone(result)
 
 
 if __name__ == '__main__':
