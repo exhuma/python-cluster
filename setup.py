@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 readme_contents = open("README.rst").read()
 
