@@ -10,7 +10,7 @@ sentence_end = readme_contents.find('.', parastart)
 
 setup(
     name='cluster',
-    version='1.2.2',
+    version=open('cluster/version.txt').read().strip(),
     author='Michel Albert',
     author_email='michel@albert.lu',
     url='https://github.com/exhuma/python-cluster',
