@@ -1,2 +1,3 @@
 include README.rst LICENSE CHANGELOG
 include cluster.bmp
+include cluster/version.txt
