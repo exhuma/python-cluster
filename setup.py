@@ -18,6 +18,7 @@ setup(
     license='LGPL',
     description=readme_contents[parastart:sentence_end],
     long_description=readme_contents,
+    include_package_data=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
