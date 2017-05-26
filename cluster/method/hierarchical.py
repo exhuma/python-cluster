@@ -206,3 +206,14 @@ class HierarchicalClustering(BaseClusterMethod):
             self.cluster()
 
         return self._data[0].getlevel(threshold)
+        
+    def display(self):
+        """
+        Prints a simple dendogram-like representation of the full cluster
+        to the console.
+        """
+        # initialize the cluster if not yet done
+        if not self.__cluster_created:
+            self.cluster()
+
+        self._data[0].display()
