@@ -66,13 +66,6 @@ class HClusterSmallListTestCase(Py23TestCase):
 
 class HClusterIntegerTestCase(Py23TestCase):
 
-    def __init__(self, *args, **kwargs):
-        super(HClusterIntegerTestCase, self).__init__(*args, **kwargs)
-        if hexversion < 0x030000f0:
-            self.assertCItemsEqual = self.assertItemsEqual
-        else:
-            self.assertCItemsEqual = self.assertCountEqual
-
     def setUp(self):
         self.__data = [791, 956, 676, 124, 564, 84, 24, 365, 594, 940, 398,
                        971, 131, 365, 542, 336, 518, 835, 134, 391]

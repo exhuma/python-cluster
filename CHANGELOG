@@ -1,3 +1,6 @@
+1.4.0
+   - Added a "display" method to hierarchical clusters (by 1kastner).
+
 1.2.1
    - Fixed an issue in multiprocessing code.
 
