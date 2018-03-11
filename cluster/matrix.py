@@ -31,18 +31,30 @@ def _encapsulate_item_for_combinfunc(item):
     before the invocation of combinfunc.
         if not hasattr(item, '__iter__') or isinstance(item, tuple):
             item = [item]
-    Logging has been added to the original two lines
-    and shows that the behaviour of this snippet
+    Logging was added to the original two lines
+    and shows that the outcome of this snippet
     has changed between Python2.7 and Python3.5.
+    This logging showed that the difference in 
+    outcome consisted of the handling of the builtin
+    str class, which was encapsulated into a list in
+    Python2.7 but returned naked in Python3.5.
+    Adding a test for this specific class to the 
+    set of conditions appears to give correct behaviour
+    under both versions.
     """
     encapsulated_item = None
-    if not hasattr(item, '__iter__') or isinstance(item, tuple):
+    if  (
+        not hasattr(item, '__iter__') or
+        isinstance(item, tuple) or
+        isinstance(item, str)
+    ):
         encapsulated_item = [item]
     else:
         encapsulated_item = item
     logging.debug(
         "item class:%s encapsulated as:%s ",
-        item.__class__, encapsulated_item.__class__
+        item.__class__.__name__, 
+        encapsulated_item.__class__.__name__
     )
     return encapsulated_item
 
