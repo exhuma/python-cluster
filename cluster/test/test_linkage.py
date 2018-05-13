@@ -29,3 +29,14 @@ class LinkageMethods(unittest.TestCase):
         result = average(self.set_a, self.set_b, self.dist)
         expected = 22.5
         self.assertEqual(result, expected)
+
+if __name__ == '__main__':
+
+    import logging
+
+    suite = unittest.TestSuite((
+        unittest.makeSuite(LinkageMethods),
+    ))
+
+    logging.basicConfig(level=logging.DEBUG)
+    unittest.TextTestRunner(verbosity=2).run(suite)
