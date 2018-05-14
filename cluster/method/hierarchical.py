@@ -56,7 +56,8 @@ class HierarchicalClustering(BaseClusterMethod):
 
     :param data: The collection of items to be clustered.
     :param distance_function: A function which takes two elements of ``data``
-        and returns a distance between both elements.
+        and returns a distance between both elements (note that the distance
+        should not be returned as negative value!)
     :param linkage: The method used to determine the distance between two
         clusters. See :py:meth:`~.HierarchicalClustering.set_linkage_method` for
         possible values.
@@ -206,7 +207,7 @@ class HierarchicalClustering(BaseClusterMethod):
             self.cluster()
 
         return self._data[0].getlevel(threshold)
-        
+
     def display(self):
         """
         Prints a simple dendogram-like representation of the full cluster
