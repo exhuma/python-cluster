@@ -1,3 +1,11 @@
+Release 1.4.1.post1
+===================
+
+This is a "house-keeping" commit. No new features or fixes are introduced.
+
+* Update changelog.
+* Switch doc-building to use ``pipenv`` & update ``Pipfile`` accordingly.
+
 Release 1.4.1
 =============
 
