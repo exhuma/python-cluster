@@ -4,5 +4,8 @@ python:
   - "3.3"
   - "3.5"
   - "nightly"
-install: pip install tox-travis
-script: "tox"
+install:
+  - "pip install -e ."
+  - "pip install -U pytest"
+script:
+  - "pytest"
