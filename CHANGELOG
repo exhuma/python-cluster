@@ -1,3 +1,13 @@
+Release 1.4.1.post2
+===================
+
+This is a "house-keeping" commit. No new features or fixes are introduced.
+
+* Update changelog.
+* Removed the ``Pipfile`` which was introduced in ``1.4.1.post1``. The file
+  caused false positives on security checks. Additionally, having a ``Pipfile``
+  is mainly useful in applications, and not in libraries like this one.
+
 Release 1.4.1.post1
 ===================
 
