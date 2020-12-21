@@ -7,5 +7,14 @@ python:
   - "3.3"
   - "3.5"
   - "nightly"
+jobs:
+ exclude:
+  - python: "3.3"
+    arch: amd64
+  - python: "3.3"
+    arch: ppc64le
+
+  
+    
 install: pip install tox-travis
 script: "tox"
