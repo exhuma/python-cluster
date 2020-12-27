@@ -1,3 +1,6 @@
+arch:
+  - amd64
+  - ppc64le
 language: python
 python:
   - "2.7"
@@ -9,3 +12,9 @@ install:
   - "pip install -U pytest"
 script:
   - "pytest"
+jobs:
+ exclude:
+  - python: "3.3"
+    arch: amd64
+  - python: "3.3"
+    arch: ppc64le
