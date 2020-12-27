@@ -1,3 +1,11 @@
+Release 1.4.1.post3
+===================
+
+This is a "house-keeping" commit. No new features or fixes are introduced.
+
+* Update CI test rules to include amd64 and ppc (santosh653)
+
+
 Release 1.4.1.post2
 ===================
 
