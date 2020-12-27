@@ -4,17 +4,14 @@ arch:
 language: python
 python:
   - "2.7"
-  - "3.3"
   - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "3.9"
   - "nightly"
 install:
   - "pip install -e ."
   - "pip install -U pytest"
 script:
   - "pytest"
-jobs:
- exclude:
-  - python: "3.3"
-    arch: amd64
-  - python: "3.3"
-    arch: ppc64le
