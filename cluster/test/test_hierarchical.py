@@ -162,10 +162,6 @@ class HClusterIntegerTestCase(Py23TestCase):
         self.assertEqual(sorted(new_data), sorted(self.__data))
 
     def testMultiprocessing(self):
-        self.skipTest('Test fails with the following exception'
-                      "AttributeError: Can't pickle local object "
-                      "'HClusterIntegerTestCase.testMultiprocessing."
-                      "<locals>.<lambda>")
         cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y),
                                     num_processes=4)
         new_data = []
