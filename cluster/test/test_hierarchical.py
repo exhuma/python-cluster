@@ -278,5 +278,5 @@ if __name__ == '__main__':
         unittest.makeSuite(Issue28TestCase),
     ))
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     unittest.TextTestRunner(verbosity=2).run(suite)
