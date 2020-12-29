@@ -1,8 +1,3 @@
-.. note::
-    This fork by Tim Littlefair of the original python-cluster repository by exhuma 
-    is archived and may be deleted shortly.
-    Please refer to the original repository at https://github.com/exhuma/python-cluster
-
 DESCRIPTION
 ===========
 
