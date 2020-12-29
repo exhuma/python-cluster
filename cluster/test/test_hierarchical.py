@@ -231,15 +231,18 @@ class HClusterTuplesTestCase(Py23TestCase):
         result = cl.getlevel(40)
         self.assertIsNotNone(result)
 
+
 class Issue28TestCase(Py23TestCase):
     '''
     Test case to cover the case where the data consist
-    of dictionary keys, and the distance function executes 
+    of dictionary keys, and the distance function executes
     on the values these keys are associated with in the
     dictionary, rather than the keys themselves.
 
-    Behaviour for this test case differs between Python2.7
-    and Python3.5: on 2.7 the test behaves as expected, 
+    Behaviour for this test case differed between Python2.7
+    and Python3.5 prior to resolution if the issue: on 2.7
+    the test behaved as expected, whereas in 3.5 the test
+    reproduced the problem.
 
     See Github issue #28.
     '''
@@ -248,15 +251,16 @@ class Issue28TestCase(Py23TestCase):
         "Issue28 (Hierarchical Clustering)"
 
         points1D = {
-            'p4' : 5, 'p2' : 6, 'p7' : 10,
-            'p9' : 120, 'p10' : 121, 'p11' : 119,
+            'p4': 5, 'p2': 6, 'p7': 10,
+            'p9': 120, 'p10': 121, 'p11': 119,
         }
 
-        distance_func = lambda a,b : abs(points1D[a]-points1D[b])
+        distance_func = lambda a, b: abs(points1D[a]-points1D[b])
         cl = HierarchicalClustering(list(points1D.keys()), distance_func)
         result = cl.getlevel(20)
         self.assertIsNotNone(result)
-    
+
+
 if __name__ == '__main__':
 
     import logging
