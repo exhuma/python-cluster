@@ -33,6 +33,18 @@ import unittest
 from cluster import HierarchicalClustering
 
 
+def distance(x, y):
+    """
+    Calculate the distance between x and y
+
+    Example:
+
+    >>> distance(5, 3)
+    2
+    """
+    return abs(x - y)
+
+
 class Py23TestCase(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
@@ -162,8 +174,7 @@ class HClusterIntegerTestCase(Py23TestCase):
         self.assertEqual(sorted(new_data), sorted(self.__data))
 
     def testMultiprocessing(self):
-        cl = HierarchicalClustering(self.__data, lambda x, y: abs(x - y),
-                                    num_processes=4)
+        cl = HierarchicalClustering(self.__data, distance, num_processes=4)
         new_data = []
         [new_data.extend(_) for _ in cl.getlevel(40)]
         self.assertEqual(sorted(new_data), sorted(self.__data))
