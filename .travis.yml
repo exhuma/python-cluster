@@ -11,7 +11,8 @@ python:
   - "3.9"
   - "nightly"
 install:
-  - "pip install -e ."
-  - "pip install -U pytest"
+  - "pip install -U pip"
+  - "pip install poetry"
+  - "poetry install --no-ansi"
 script:
-  - "pytest"
+  - "poetry run pytest"

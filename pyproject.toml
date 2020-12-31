@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "cluster"
+version = "1.4.1.post3"
+description = "A pure-python clustering library able to cluster any objects"
+authors = ["Michel Albert <michel@albert.lu>"]
+homepage = "https://github.com/exhuma/python-cluster"
+license = "LGPL"
+readme = "README.rst"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Other Audience",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+repository = "https://github.com/exhuma/python-cluster"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.1.1"
+sphinx = "^3.2.1"
+sphinx-rtd-theme = "^0.5.0"
+pylint = "^2.6.0"
+pytest-cov = "^2.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line_length = 80
+
+[tool.isort]
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 80
+multi_line_output = 3
+not_skip = "__init__.py"
+use_parentheses = true
+virtual_env = ".venv"
+
+[tool.pylint."messages control"]
+disable = ["C0330", "C0326", "duplicate-code", "fixme"]
+
+[tool.pylint.format]
+max-line-length = 80
+
+[tool.pylint.master]
+ignore = [".git", ".venv"]
+
+[tool.pylint.reports]
+output-format = "colorized"
+reports = "no"
+
