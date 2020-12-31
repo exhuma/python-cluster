@@ -22,28 +22,19 @@ from multiprocessing import Process, Queue, current_process
 
 logger = logging.getLogger(__name__)
 
+
 def _encapsulate_item_for_combinfunc(item):
     """
-    This function has been extracted in order to 
-    make Github issue #28 easier to investigate.
-    It replaces the following two lines of code, 
-    which occur twice in method genmatrix, just
-    before the invocation of combinfunc.
+    This function replaces inline code of the form
         if not hasattr(item, '__iter__') or isinstance(item, tuple):
             item = [item]
-    Logging was added to the original two lines
-    and shows that the outcome of this snippet
-    has changed between Python2.7 and Python3.5.
-    This logging showed that the difference in 
-    outcome consisted of the handling of the builtin
-    str class, which was encapsulated into a list in
-    Python2.7 but returned naked in Python3.5.
-    Adding a test for this specific class to the 
-    set of conditions appears to give correct behaviour
-    under both versions.
+    which was found to behave inconsistently between Python2.7 and
+    Python3.5 under issue #28, when 'item' was an object of type str.
+    The logging used to investigate this issue has been retained, in
+    case there is a future need to investigate issues with other types.
     """
     encapsulated_item = None
-    if  (
+    if (
         not hasattr(item, '__iter__') or
         isinstance(item, tuple) or
         isinstance(item, str)
@@ -53,7 +44,7 @@ def _encapsulate_item_for_combinfunc(item):
         encapsulated_item = item
     logging.debug(
         "item class:%s encapsulated as:%s ",
-        item.__class__.__name__, 
+        item.__class__.__name__,
         encapsulated_item.__class__.__name__
     )
     return encapsulated_item
@@ -158,16 +149,6 @@ class Matrix(object):
                         row[col_index] = result
                         num_tasks_completed += 1
                 else:
-                    # Otherwise do it here, in line
-                    """
-                    if not hasattr(item, '__iter__') or isinstance(item, tuple):
-                        item = [item]
-                    if not hasattr(item2, '__iter__') or isinstance(item2, tuple):
-                        item2 = [item2]
-                    """
-                    # See the comment in function _encapsulate_item_for_combinfunc
-                    # for details of why the lines above have been replaced
-                    # by function invocations
                     item = _encapsulate_item_for_combinfunc(item)
                     item2 = _encapsulate_item_for_combinfunc(item2)
                     row[col_index] = self.combinfunc(item, item2)
